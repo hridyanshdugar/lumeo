@@ -36,7 +36,7 @@ A multi-user portfolio website platform with PostgreSQL backend. Users can regis
 ### 1. Clone and Install
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/hridyanshdugar/lumeo.git
 cd portfolio-gen
 npm install
 ```
