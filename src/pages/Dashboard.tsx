@@ -144,7 +144,7 @@ export default function Dashboard() {
                   : 'bg-cyan-500/20 text-cyan-400 border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
               }`}
             >
-              {copied ? '✓ COPIED' : '🔗 COPY_LINK'}
+              {copied ? 'COPIED' : 'COPY_LINK'}
             </button>
           </div>
 
