@@ -4,14 +4,14 @@ A multi-user portfolio website platform with PostgreSQL backend. Users can regis
 
 ## Features
 
-- ✨ **Multi-User System**: Register and manage your own portfolio
-- 🎨 **Multiple Themes**: Choose from Minimal, Modern, and Gradient themes
-- 🔐 **Secure Authentication**: JWT-based auth with bcrypt password hashing
-- 📝 **JSON-Based Content**: Easy-to-edit portfolio data
-- 🗄️ **PostgreSQL Database**: Persistent storage for all user data
-- 🌐 **Public Portfolios**: Share your work via username URLs
-- 📱 **Responsive Design**: All themes are mobile-friendly
-- ⚡ **Real-time Updates**: Instant preview of changes
+- **Multi-User System**: Register and manage your own portfolio
+- **Multiple Themes**: Choose from Minimal, Modern, and Gradient themes
+- **Secure Authentication**: JWT-based auth with bcrypt password hashing
+- **JSON-Based Content**: Easy-to-edit portfolio data
+- **PostgreSQL Database**: Persistent storage for all user data
+- **Public Portfolios**: Share your work via username URLs
+- **Responsive Design**: All themes are mobile-friendly
+- **Real-time Updates**: Instant preview of changes
 
 ## Tech Stack
 
