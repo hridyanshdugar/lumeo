@@ -129,12 +129,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main Preview Window */}
-      <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col gap-4">
+      {/* Main Preview + Editor Area */}
+      <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col gap-4 min-h-0">
         {/* Preview Window */}
-        <div className={`border-2 border-cyan-400/30 flex flex-col transition-all duration-300 ${
-          isEditorOpen ? 'h-1/2' : 'flex-1'
-        }`}>
+        <div className="border-2 border-cyan-400/30 flex flex-col transition-all duration-300 flex-1 min-h-0">
           {/* Preview Label */}
           <div className="bg-black border-b-2 border-cyan-400/30 px-4 py-2 flex items-center justify-between flex-shrink-0">
             <p className="text-cyan-400 font-mono text-sm">&gt; PREVIEW_WINDOW [{currentTheme}]</p>
@@ -151,14 +149,14 @@ export default function Dashboard() {
           </div>
 
           {/* Portfolio Preview with Scroll */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
             <CurrentThemeComponent manifest={currentUser.manifest} />
           </div>
         </div>
 
-        {/* Editor Window */}
+        {/* Editor Window*/}
         {isEditorOpen && (
-          <div className="flex-1 border-2 border-cyan-400/30 flex flex-col">
+          <div className="flex-1 border-2 border-cyan-400/30 flex flex-col min-h-0">
             {/* Editor Header */}
             <div className="bg-black border-b-2 border-cyan-400/30 px-4 py-2 flex items-center justify-between flex-shrink-0">
               <div>
@@ -173,7 +171,7 @@ export default function Dashboard() {
             </div>
 
             {/* Editor Content */}
-            <div className="flex-1 overflow-hidden p-4">
+            <div className="flex-1 overflow-hidden p-4 min-h-0">
               <ManifestEditor
                 manifest={currentUser.manifest}
                 onSave={handleSaveManifest}
