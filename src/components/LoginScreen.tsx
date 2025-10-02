@@ -90,14 +90,6 @@ export default function LoginScreen({ onLogin, onCancel }: LoginScreenProps) {
             </button>
           </div>
         </form>
-
-        {/* Info
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-800">
-            <strong>Note:</strong> Default credentials are in{' '}
-            <code className="bg-blue-100 px-1 py-0.5 rounded">src/contexts/AuthContext.tsx</code>
-          </p>
-        </div> */}
       </div>
     </div>
   )
