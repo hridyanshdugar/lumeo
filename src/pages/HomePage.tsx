@@ -65,14 +65,10 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="text-center text-neutral-800 mb-16">
           <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-wider uppercase" style={{ textShadow: '2px 2px 0 rgba(64,64,64,0.1)' }}>
-            Build Your Portfolio
+            Lumeo
           </h1>
-          <p className="text-2xl md:text-3xl mb-8 text-neutral-700 font-light tracking-wide">
-            Professional. Clean. Effective.
-          </p>
-          <p className="text-xl text-neutral-600 max-w-3xl mx-auto mb-12 font-mono">
-            &gt; Create your professional presence with clean themes,
-            customize everything easily, and share your work.
+          <p className="text-2xl md:text-3xl mb-12 text-neutral-700 font-light tracking-wide">
+            Simple. Professional. Yours.
           </p>
 
           {/* CTA Buttons */}
@@ -98,25 +94,25 @@ export default function HomePage() {
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">◆</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Multiple Themes</h3>
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Create</h3>
             <p className="text-neutral-600 font-mono text-sm">
-              &gt; Choose from Minimal, Modern, and Gradient styles. Switch instantly.
+              &gt; Multiple styles. Switch anytime.
             </p>
           </div>
 
           <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">▶</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Easy Editing</h3>
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Edit</h3>
             <p className="text-neutral-600 font-mono text-sm">
-              &gt; Edit your portfolio with JSON. See changes instantly. No coding needed.
+              &gt; Change content. See updates instantly.
             </p>
           </div>
 
           <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">■</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Secure & Private</h3>
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Share</h3>
             <p className="text-neutral-600 font-mono text-sm">
-              &gt; Your data is encrypted. Control who sees your portfolio.
+              &gt; Public link. Your control.
             </p>
           </div>
         </div>
