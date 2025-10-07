@@ -166,16 +166,17 @@ export default function ManifestEditor({ manifest, onSave, onClose }: ManifestEd
   return (
     <div className="h-full flex flex-col">
       {/* Header with Info Link */}
-      <div className="p-4 border-b border-cyan-400/30 bg-black flex items-center justify-between">
-        <div className="text-sm text-cyan-400/70 font-mono">
-          &gt; manifest_editor
+      <div className="p-4 border-b-4 border-neutral-600 bg-neutral-800 flex items-center justify-between">
+        <div className="text-sm text-neutral-300 font-mono uppercase">
+          &gt; Manifest Editor
         </div>
         <Link
           to="/manifest-info"
           target="_blank"
-          className="px-4 py-1.5 border border-cyan-400/50 text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_10px_rgba(0,243,255,0.3)] transition font-mono text-xs tracking-wider"
+          className="px-4 py-1.5 border-3 border-neutral-500 text-neutral-300 bg-neutral-700 hover:bg-neutral-600 hover:border-neutral-400 hover:shadow-md transition font-mono text-xs tracking-wider uppercase shadow-sm"
+          style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
         >
-          FIELD GUIDE
+          Field Guide
         </Link>
       </div>
 
@@ -184,25 +185,26 @@ export default function ManifestEditor({ manifest, onSave, onClose }: ManifestEd
         <textarea
           value={jsonText}
           onChange={(e) => setJsonText(e.target.value)}
-          className="w-full h-full font-mono text-sm p-4 bg-black border border-cyan-400/30 text-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none resize-none"
+          className="w-full h-full font-mono text-sm p-4 bg-neutral-900 border-2 border-neutral-600 text-neutral-200 focus:border-neutral-500 focus:shadow-md outline-none resize-none"
           spellCheck={false}
+          style={{ imageRendering: 'pixelated' }}
         />
       </div>
 
       {/* Error Messages */}
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500">
-          <p className="text-red-400 text-sm font-mono">&gt; ERROR: {error}</p>
+        <div className="p-3 bg-red-100 border-t-4 border-red-700">
+          <p className="text-red-800 text-sm font-mono uppercase">&gt; ERROR: {error}</p>
         </div>
       )}
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="max-h-40 overflow-y-auto bg-red-500/10 border border-red-500">
+        <div className="max-h-40 overflow-y-auto bg-red-100 border-t-4 border-red-700">
           <div className="p-3">
-            <p className="text-red-400 text-sm font-mono font-bold mb-2">&gt; VALIDATION ERRORS:</p>
+            <p className="text-red-800 text-sm font-mono font-bold mb-2 uppercase">&gt; Validation Errors:</p>
             {validationErrors.map((err, index) => (
-              <p key={index} className="text-red-400 text-xs font-mono ml-4 mb-1">
+              <p key={index} className="text-red-700 text-xs font-mono ml-4 mb-1">
                 • {err.path}: {err.message}
               </p>
             ))}
@@ -211,22 +213,24 @@ export default function ManifestEditor({ manifest, onSave, onClose }: ManifestEd
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between p-4 border-t border-cyan-400/30 bg-black">
-        <div className="text-sm text-cyan-400/70 font-mono">
-          &gt; validate_json_before_commit
+      <div className="flex items-center justify-between p-4 border-t-4 border-neutral-600 bg-neutral-800">
+        <div className="text-sm text-neutral-400 font-mono uppercase">
+          &gt; Validate Before Save
         </div>
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-cyan-400/50 text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition font-mono tracking-wider"
+            className="px-6 py-2.5 border-3 border-neutral-500 bg-neutral-700 text-neutral-300 hover:bg-neutral-600 hover:border-neutral-400 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
+            style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
           >
-            CANCEL
+            Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-cyan-500/20 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(0,243,255,0.5)] transition font-mono tracking-wider"
+            className="px-6 py-2.5 bg-neutral-600 border-4 border-neutral-400 text-white hover:bg-neutral-500 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
+            style={{ imageRendering: 'pixelated' }}
           >
-            COMMIT
+            Save
           </button>
         </div>
       </div>

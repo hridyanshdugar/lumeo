@@ -51,70 +51,72 @@ export default function HomePage() {
   }
 
   return (
-    <div className="h-screen bg-black relative overflow-hidden">
-      {/* Tron Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px))] bg-[length:50px_50px] opacity-20"></div>
+    <div className="h-screen bg-neutral-100 relative overflow-hidden" style={{ imageRendering: 'pixelated' }}>
+      {/* Subtle Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.1)_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.1)_calc(100%-1px))] bg-[length:40px_40px] opacity-50"></div>
 
-      {/* Animated Glow Lines */}
+      {/* Subtle Border Lines */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-neutral-400 opacity-30"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-neutral-400 opacity-30"></div>
       </div>
 
       <div className="container mx-auto px-6 py-20 relative z-10">
         {/* Hero Section */}
-        <div className="text-center text-cyan-400 mb-16">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-wider drop-shadow-[0_0_15px_rgba(0,243,255,0.5)]">
-            BUILD YOUR PORTFOLIO
+        <div className="text-center text-neutral-800 mb-16">
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-wider uppercase" style={{ textShadow: '2px 2px 0 rgba(64,64,64,0.1)' }}>
+            Build Your Portfolio
           </h1>
-          <p className="text-2xl md:text-3xl mb-8 text-cyan-300 font-light tracking-wide">
-            DIGITAL IDENTITY. UNLIMITED POSSIBILITIES.
+          <p className="text-2xl md:text-3xl mb-8 text-neutral-700 font-light tracking-wide">
+            Professional. Clean. Effective.
           </p>
-          <p className="text-xl text-cyan-400/70 max-w-3xl mx-auto mb-12 font-mono">
-            &gt; Initialize your presence in the digital grid. Choose from advanced themes,
-            customize with JSON protocols, and deploy your work to the network.
+          <p className="text-xl text-neutral-600 max-w-3xl mx-auto mb-12 font-mono">
+            &gt; Create your professional presence with clean themes,
+            customize everything easily, and share your work.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex gap-6 justify-center">
+          <div className="flex gap-6 justify-center flex-wrap">
             <button
               onClick={() => setShowRegister(true)}
-              className="px-8 py-4 bg-cyan-500/20 text-cyan-400 border-2 border-cyan-400 font-bold text-lg hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(0,243,255,0.5)] transition transform hover:scale-105 tracking-wider"
+              className="px-8 py-4 bg-neutral-700 text-white border-4 border-neutral-500 font-bold text-lg hover:bg-neutral-600 hover:shadow-md transition uppercase tracking-wider shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
             >
-              INITIALIZE
+              Get Started
             </button>
             <button
               onClick={() => setShowLogin(true)}
-              className="px-8 py-4 bg-transparent text-cyan-400 border-2 border-cyan-400/50 font-bold text-lg hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition tracking-wider"
+              className="px-8 py-4 bg-neutral-200 text-neutral-800 border-4 border-neutral-400 font-bold text-lg hover:bg-neutral-300 hover:shadow-md transition uppercase tracking-wider shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
             >
-              ACCESS GRID
+              Sign In
             </button>
           </div>
         </div>
 
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <div className="bg-black/50 backdrop-blur-sm border-2 border-cyan-500/30 p-8 text-cyan-400 hover:border-cyan-500 hover:shadow-[0_0_30px_rgba(0,243,255,0.2)] transition">
+          <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">◆</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide">MULTIPLE PROTOCOLS</h3>
-            <p className="text-cyan-400/70 font-mono text-sm">
-              &gt; Access Minimal, Modern, and Gradient visual modes. Switch protocols in real-time.
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Multiple Themes</h3>
+            <p className="text-neutral-600 font-mono text-sm">
+              &gt; Choose from Minimal, Modern, and Gradient styles. Switch instantly.
             </p>
           </div>
 
-          <div className="bg-black/50 backdrop-blur-sm border-2 border-cyan-500/30 p-8 text-cyan-400 hover:border-cyan-500 hover:shadow-[0_0_30px_rgba(0,243,255,0.2)] transition">
+          <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">▶</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide">INSTANT UPDATES</h3>
-            <p className="text-cyan-400/70 font-mono text-sm">
-              &gt; Modify your data matrix with integrated JSON editor. Zero compilation required.
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Easy Editing</h3>
+            <p className="text-neutral-600 font-mono text-sm">
+              &gt; Edit your portfolio with JSON. See changes instantly. No coding needed.
             </p>
           </div>
 
-          <div className="bg-black/50 backdrop-blur-sm border-2 border-cyan-500/30 p-8 text-cyan-400 hover:border-cyan-500 hover:shadow-[0_0_30px_rgba(0,243,255,0.2)] transition">
+          <div className="bg-white backdrop-blur-sm border-4 border-neutral-300 p-8 text-neutral-800 hover:border-neutral-400 hover:shadow-lg transition shadow-md" style={{ imageRendering: 'pixelated' }}>
             <div className="text-4xl mb-4">■</div>
-            <h3 className="text-2xl font-bold mb-3 tracking-wide">SECURE NETWORK</h3>
-            <p className="text-cyan-400/70 font-mono text-sm">
-              &gt; Encrypted data storage. Full control over grid visibility parameters.
+            <h3 className="text-2xl font-bold mb-3 tracking-wide uppercase">Secure & Private</h3>
+            <p className="text-neutral-600 font-mono text-sm">
+              &gt; Your data is encrypted. Control who sees your portfolio.
             </p>
           </div>
         </div>

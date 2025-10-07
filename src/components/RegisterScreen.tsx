@@ -41,82 +41,86 @@ export default function RegisterScreen({ onRegister, onCancel, onSwitchToLogin }
   }
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
-      {/* Tron Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px))] bg-[length:50px_50px] opacity-20"></div>
+    <div className="fixed inset-0 bg-neutral-900/90 z-50 flex items-center justify-center p-4" style={{ imageRendering: 'pixelated' }}>
+      {/* Subtle Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.2)_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.2)_calc(100%-1px))] bg-[length:40px_40px] opacity-30"></div>
 
-      <div className="bg-black border-2 border-cyan-400 shadow-[0_0_50px_rgba(0,243,255,0.3)] w-full max-w-md p-8 relative z-10">
+      <div className="bg-white border-4 border-neutral-600 shadow-lg w-full max-w-md p-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 border-2 border-cyan-400 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,243,255,0.5)]">
-            <span className="text-3xl text-cyan-400">▶</span>
+          <div className="w-16 h-16 border-4 border-neutral-600 flex items-center justify-center mx-auto mb-4 shadow-md">
+            <span className="text-3xl text-neutral-800">▶</span>
           </div>
-          <h2 className="text-3xl font-bold text-cyan-400 mb-2 tracking-wider">INITIALIZE USER</h2>
-          <p className="text-cyan-400/70 font-mono text-sm">&gt; Create new grid identity</p>
+          <h2 className="text-3xl font-bold text-neutral-800 mb-2 tracking-wider uppercase">Register</h2>
+          <p className="text-neutral-600 font-mono text-sm">&gt; Create your account</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-cyan-400 mb-2 font-mono tracking-wide">
-              USERNAME
+            <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2 font-mono tracking-wide uppercase">
+              Username
             </label>
             <input
               id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-cyan-400/50 text-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none transition font-mono"
-              placeholder="choose_username"
+              className="w-full px-4 py-3 bg-neutral-50 border-3 border-neutral-400 text-neutral-800 focus:border-neutral-600 focus:shadow-md outline-none transition font-mono"
+              style={{ borderWidth: '3px' }}
+              placeholder="choose username"
               autoFocus
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-cyan-400 mb-2 font-mono tracking-wide">
-              EMAIL
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2 font-mono tracking-wide uppercase">
+              Email
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-cyan-400/50 text-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none transition font-mono"
-              placeholder="user@grid.net"
+              className="w-full px-4 py-3 bg-neutral-50 border-3 border-neutral-400 text-neutral-800 focus:border-neutral-600 focus:shadow-md outline-none transition font-mono"
+              style={{ borderWidth: '3px' }}
+              placeholder="user@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-cyan-400 mb-2 font-mono tracking-wide">
-              PASSWORD
+            <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2 font-mono tracking-wide uppercase">
+              Password
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-cyan-400/50 text-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none transition font-mono"
-              placeholder="min_6_chars"
+              className="w-full px-4 py-3 bg-neutral-50 border-3 border-neutral-400 text-neutral-800 focus:border-neutral-600 focus:shadow-md outline-none transition font-mono"
+              style={{ borderWidth: '3px' }}
+              placeholder="min 6 characters"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-cyan-400 mb-2 font-mono tracking-wide">
-              CONFIRM
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 mb-2 font-mono tracking-wide uppercase">
+              Confirm Password
             </label>
             <input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-black border border-cyan-400/50 text-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,243,255,0.3)] outline-none transition font-mono"
-              placeholder="re_enter_password"
+              className="w-full px-4 py-3 bg-neutral-50 border-3 border-neutral-400 text-neutral-800 focus:border-neutral-600 focus:shadow-md outline-none transition font-mono"
+              style={{ borderWidth: '3px' }}
+              placeholder="re-enter password"
             />
           </div>
 
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500">
-              <p className="text-red-400 text-sm font-mono">&gt; ERROR: {error}</p>
+            <div className="p-4 bg-red-100 border-4 border-red-700">
+              <p className="text-red-800 text-sm font-mono uppercase">&gt; ERROR: {error}</p>
             </div>
           )}
 
@@ -124,28 +128,30 @@ export default function RegisterScreen({ onRegister, onCancel, onSwitchToLogin }
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-6 py-3 border border-cyan-400/50 text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition font-mono tracking-wider"
+              className="flex-1 px-6 py-3 border-4 border-neutral-500 bg-neutral-200 text-neutral-800 hover:bg-neutral-300 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
             >
-              CANCEL
+              Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-cyan-500/20 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(0,243,255,0.5)] transition font-mono tracking-wider"
+              className="flex-1 px-6 py-3 bg-neutral-700 border-4 border-neutral-500 text-white hover:bg-neutral-600 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
             >
-              INITIALIZE
+              Register
             </button>
           </div>
         </form>
 
         {/* Switch to login */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-cyan-400/70 font-mono">
-            &gt; existing_user?{' '}
+          <p className="text-sm text-neutral-600 font-mono">
+            &gt; Already have an account?{' '}
             <button
               onClick={onSwitchToLogin}
-              className="text-cyan-400 hover:text-cyan-300 font-medium underline"
+              className="text-neutral-800 hover:text-neutral-600 font-medium underline"
             >
-              access_here
+              Sign in here
             </button>
           </p>
         </div>
