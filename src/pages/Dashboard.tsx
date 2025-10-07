@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useUser } from '../contexts/UserContext'
 import { ThemeName } from '../App'
+import { Link } from 'react-router-dom'
 import MinimalTheme from '../themes/MinimalTheme'
 import ModernTheme from '../themes/ModernTheme'
 import GradientTheme from '../themes/GradientTheme'
@@ -35,7 +36,7 @@ export default function Dashboard() {
 
   const currentTheme = (currentUser.theme || 'minimal') as ThemeName
   const CurrentThemeComponent = themes[currentTheme]
-  const portfolioUrl = `${window.location.origin}/portfolio/${currentUser.username}`
+  const portfolioUrl = `${window.location.origin}/${currentUser.username}`
 
   const handleSaveManifest = async (manifest: PortfolioManifest) => {
     try {
@@ -87,18 +88,19 @@ export default function Dashboard() {
           {/* Theme Selector */}
           <div className="mb-8">
             <h3 className="text-sm font-mono text-neutral-300 mb-3 tracking-wide uppercase px-2 py-1 bg-neutral-900 border-2 border-neutral-600 inline-block">Themes</h3>
-            <div className="space-y-2 mt-3">
+            <div className="mt-3 border-4 border-neutral-600 bg-neutral-900 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-600 scrollbar-track-neutral-900">
               {Object.keys(themes).map((theme) => (
                 <button
                   key={theme}
                   onClick={() => handleThemeChange(theme as ThemeName)}
-                  className={`w-full px-4 py-3 text-left capitalize transition-all font-mono tracking-wide border-4 ${
+                  className={`w-full px-4 py-3 text-left capitalize transition-all font-mono tracking-wide border-b-2 border-neutral-700 last:border-b-0 ${
                     currentTheme === theme
-                      ? 'bg-neutral-600 text-white border-neutral-400 shadow-md'
-                      : 'bg-neutral-700 text-neutral-300 border-neutral-600 hover:border-neutral-500 hover:bg-neutral-650 shadow-sm'
+                      ? 'bg-neutral-600 text-white'
+                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                   }`}
                   style={{ imageRendering: 'pixelated' }}
                 >
+                  <span className="mr-2">{currentTheme === theme ? '▶' : '◆'}</span>
                   {theme}
                 </button>
               ))}
@@ -169,13 +171,25 @@ export default function Dashboard() {
             <div>
               <p className="text-neutral-300 font-mono text-sm uppercase">&gt; Manifest Editor</p>
             </div>
-            <button
-              onClick={() => setIsEditorOpen(false)}
-              className="text-white bg-neutral-700 hover:bg-neutral-600 text-xl font-bold w-8 h-8 flex items-center justify-center border-3 border-neutral-500 hover:shadow-md transition shadow-sm"
-              style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
-            >
-              ×
-            </button>
+
+            <div className="flex items-center gap-3">
+              <Link
+                to="/manifest-info"
+                target="_blank"
+                className="px-4 py-1.5 border-3 border-neutral-500 text-neutral-300 bg-neutral-700 hover:bg-neutral-600 hover:border-neutral-400 hover:shadow-md transition font-mono text-xs tracking-wider uppercase shadow-sm"
+                style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
+              >
+                Field Guide
+              </Link>
+
+              <button
+                onClick={() => setIsEditorOpen(false)}
+                className="text-white bg-neutral-700 hover:bg-neutral-600 text-xl font-bold w-8 h-8 flex items-center justify-center border-3 border-neutral-500 hover:shadow-md transition shadow-sm"
+                style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           {/* Editor Content */}

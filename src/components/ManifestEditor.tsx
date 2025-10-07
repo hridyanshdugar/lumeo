@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { PortfolioManifest } from '../types/manifest'
 
 interface ManifestEditorProps {
@@ -165,21 +164,6 @@ export default function ManifestEditor({ manifest, onSave, onClose }: ManifestEd
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header with Info Link */}
-      <div className="p-4 border-b-4 border-neutral-600 bg-neutral-800 flex items-center justify-between">
-        <div className="text-sm text-neutral-300 font-mono uppercase">
-          &gt; Manifest Editor
-        </div>
-        <Link
-          to="/manifest-info"
-          target="_blank"
-          className="px-4 py-1.5 border-3 border-neutral-500 text-neutral-300 bg-neutral-700 hover:bg-neutral-600 hover:border-neutral-400 hover:shadow-md transition font-mono text-xs tracking-wider uppercase shadow-sm"
-          style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
-        >
-          Field Guide
-        </Link>
-      </div>
-
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
         <textarea
