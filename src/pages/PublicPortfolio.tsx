@@ -41,29 +41,30 @@ export default function PublicPortfolio() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="text-xl text-cyan-400 font-mono">Loading portfolio...</div>
+      <div className="flex items-center justify-center min-h-screen bg-neutral-100">
+        <div className="text-xl text-neutral-800 font-mono">Loading portfolio...</div>
       </div>
     )
   }
 
   if (error || !portfolio) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black relative overflow-hidden">
-        {/* Tron Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),#00f3ff_calc(100%-1px))] bg-[length:50px_50px] opacity-20"></div>
+      <div className="flex items-center justify-center min-h-screen bg-neutral-100 relative overflow-hidden" style={{ imageRendering: 'pixelated' }}>
+        {/* Subtle Grid Background */}
+        <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.1)_calc(100%-1px)),linear-gradient(90deg,transparent_0%,transparent_calc(100%-1px),rgba(64,64,64,0.1)_calc(100%-1px))] bg-[length:40px_40px] opacity-50"></div>
 
         <div className="text-center relative z-10">
-          <div className="w-24 h-24 border-2 border-red-400 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(239,68,68,0.5)]">
-            <span className="text-5xl text-red-400">✕</span>
+          <div className="w-24 h-24 border-4 border-red-700 flex items-center justify-center mx-auto mb-6 shadow-md bg-white">
+            <span className="text-5xl text-red-700">✕</span>
           </div>
-          <h1 className="text-4xl font-bold text-cyan-400 mb-4 tracking-wider">PORTFOLIO NOT FOUND</h1>
-          <p className="text-cyan-400/70 font-mono mb-8">&gt; {error || 'This portfolio does not exist or is not public.'}</p>
+          <h1 className="text-4xl font-bold text-neutral-800 mb-4 tracking-wider uppercase">Portfolio Not Found</h1>
+          <p className="text-neutral-600 font-mono mb-8 max-w-md">&gt; {error || 'This portfolio does not exist or is not public.'}</p>
           <a
             href="/"
-            className="inline-block px-8 py-3 bg-cyan-500/20 text-cyan-400 border-2 border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(0,243,255,0.5)] transition font-mono tracking-wider"
+            className="inline-block px-8 py-3 bg-neutral-700 text-white border-4 border-neutral-500 hover:bg-neutral-600 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
+            style={{ imageRendering: 'pixelated' }}
           >
-            ◀ RETURN_HOME
+            ◀ Return Home
           </a>
         </div>
       </div>
