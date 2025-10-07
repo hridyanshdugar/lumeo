@@ -47,19 +47,79 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const user = db.prepare('SELECT id, username, email, created_at FROM users WHERE id = ?').get(userId)
 
-    // Create default portfolio
+    // Create default portfolio with example data
     const defaultManifest = {
       personalInfo: {
-        name: '',
-        title: '',
+        name: 'Your Name',
+        title: 'Your Professional Title',
         email: email,
-        bio: '',
-        links: {}
+        phone: '+1-555-123-4567',
+        location: 'Your City, State',
+        bio: 'Write a brief professional summary about yourself. This is your opportunity to make a great first impression and highlight what makes you unique.',
+        links: {
+          github: 'https://github.com/yourusername',
+          linkedin: 'https://linkedin.com/in/yourusername',
+          twitter: 'https://twitter.com/yourusername',
+          website: 'https://yourwebsite.com'
+        }
       },
-      experience: [],
-      projects: [],
-      education: [],
-      skills: []
+      experience: [
+        {
+          company: 'Company Name',
+          position: 'Job Title',
+          startDate: '2020-01',
+          endDate: 'Present',
+          description: 'Describe your role and key responsibilities at this company.',
+          achievements: [
+            'Key achievement or impact you made',
+            'Another notable accomplishment'
+          ],
+          technologies: ['Technology 1', 'Technology 2', 'Technology 3']
+        }
+      ],
+      projects: [
+        {
+          name: 'Project Name',
+          description: 'Describe what your project does and the problem it solves. Be clear and concise.',
+          technologies: ['React', 'TypeScript', 'Node.js'],
+          links: {
+            github: 'https://github.com/yourusername/project',
+            demo: 'https://your-project-demo.com'
+          },
+          highlights: [
+            'Key feature or achievement',
+            'Another impressive aspect'
+          ]
+        }
+      ],
+      education: [
+        {
+          institution: 'University Name',
+          degree: 'Bachelor of Science',
+          field: 'Computer Science',
+          startDate: '2016-09',
+          endDate: '2020-05',
+          gpa: '3.8/4.0',
+          achievements: [
+            'Dean\'s List',
+            'Relevant awards or honors'
+          ]
+        }
+      ],
+      skills: [
+        {
+          category: 'Frontend Development',
+          items: ['React', 'TypeScript', 'HTML/CSS', 'Tailwind CSS']
+        },
+        {
+          category: 'Backend Development',
+          items: ['Node.js', 'Express', 'PostgreSQL', 'REST APIs']
+        },
+        {
+          category: 'Tools & Technologies',
+          items: ['Git', 'Docker', 'AWS', 'CI/CD']
+        }
+      ]
     }
 
     const portfolioId = randomUUID()

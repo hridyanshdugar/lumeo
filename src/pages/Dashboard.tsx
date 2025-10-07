@@ -132,27 +132,29 @@ export default function Dashboard() {
       {/* Main Preview + Editor Area */}
       <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col gap-4 min-h-0">
         {/* Preview Window */}
-        <div className="border-2 border-cyan-400/30 flex flex-col transition-all duration-300 flex-1 min-h-0">
-          {/* Preview Label */}
-          <div className="bg-black border-b-2 border-cyan-400/30 px-4 py-2 flex items-center justify-between flex-shrink-0">
-            <p className="text-cyan-400 font-mono text-sm">&gt; PREVIEW_WINDOW [{currentTheme}]</p>
-            <button
-              onClick={handleCopyLink}
-              className={`px-4 py-1.5 border font-mono text-xs tracking-wider transition ${
-                copied
-                  ? 'bg-green-500/20 text-green-400 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-                  : 'bg-cyan-500/20 text-cyan-400 border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
-              }`}
-            >
-              {copied ? 'COPIED' : 'COPY_LINK'}
-            </button>
-          </div>
+        {!isEditorOpen && (
+          <div className="border-2 border-cyan-400/30 flex flex-col transition-all duration-300 flex-1 min-h-0">
+            {/* Preview Label */}
+            <div className="bg-black border-b-2 border-cyan-400/30 px-4 py-2 flex items-center justify-between flex-shrink-0">
+              <p className="text-cyan-400 font-mono text-sm">&gt; PREVIEW_WINDOW [{currentTheme}]</p>
+              <button
+                onClick={handleCopyLink}
+                className={`px-4 py-1.5 border font-mono text-xs tracking-wider transition ${
+                  copied
+                    ? 'bg-green-500/20 text-green-400 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+                    : 'bg-cyan-500/20 text-cyan-400 border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                }`}
+              >
+                {copied ? 'COPIED' : 'COPY_LINK'}
+              </button>
+            </div>
 
-          {/* Portfolio Preview with Scroll */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
-            <CurrentThemeComponent manifest={currentUser.manifest} />
+            {/* Portfolio Preview with Scroll */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+              <CurrentThemeComponent manifest={currentUser.manifest} />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Editor Window*/}
         {isEditorOpen && (

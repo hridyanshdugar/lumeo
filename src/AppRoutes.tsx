@@ -3,6 +3,7 @@ import { useUser } from './contexts/UserContext'
 import HomePage from './pages/HomePage'
 import Dashboard from './pages/Dashboard'
 import PublicPortfolio from './pages/PublicPortfolio'
+import ManifestInfoPage from './pages/ManifestInfoPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useUser()
@@ -35,6 +36,7 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="/manifest-info" element={<ManifestInfoPage />} />
         <Route path="/:username" element={<PublicPortfolio />} />
       </Routes>
     </BrowserRouter>
