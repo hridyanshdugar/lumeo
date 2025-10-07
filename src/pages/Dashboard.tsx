@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import MinimalTheme from '../themes/MinimalTheme'
 import ModernTheme from '../themes/ModernTheme'
 import GradientTheme from '../themes/GradientTheme'
+import CyberTheme from '../themes/CyberTheme'
 import ManifestEditor from '../components/ManifestEditor'
 import Dialog from '../components/Dialog'
 import { PortfolioManifest } from '../types/manifest'
@@ -13,6 +14,7 @@ const themes = {
   minimal: MinimalTheme,
   modern: ModernTheme,
   gradient: GradientTheme,
+  cyber: CyberTheme,
 }
 
 export default function Dashboard() {

@@ -5,11 +5,13 @@ import { ThemeName } from '../App'
 import MinimalTheme from '../themes/MinimalTheme'
 import ModernTheme from '../themes/ModernTheme'
 import GradientTheme from '../themes/GradientTheme'
+import CyberTheme from '../themes/CyberTheme'
 
 const themes = {
   minimal: MinimalTheme,
   modern: ModernTheme,
   gradient: GradientTheme,
+  cyber: CyberTheme,
 }
 
 export default function PublicPortfolio() {
