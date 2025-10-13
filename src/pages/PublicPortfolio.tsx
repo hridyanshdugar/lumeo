@@ -6,12 +6,14 @@ import MinimalTheme from '../themes/MinimalTheme'
 import ModernTheme from '../themes/ModernTheme'
 import GradientTheme from '../themes/GradientTheme'
 import CyberTheme from '../themes/CyberTheme'
+import TerminalTheme from '../themes/TerminalTheme'
 
 const themes = {
   minimal: MinimalTheme,
   modern: ModernTheme,
   gradient: GradientTheme,
   cyber: CyberTheme,
+  terminal: TerminalTheme,
 }
 
 export default function PublicPortfolio() {
