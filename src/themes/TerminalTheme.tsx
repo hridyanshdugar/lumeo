@@ -5,7 +5,7 @@ interface ThemeProps {
   manifest: PortfolioManifest
 }
 
-type CommandType = 'help' | 'about' | 'experience' | 'projects' | 'education' | 'skills' | 'contact' | 'clear' | 'theme'
+type CommandType = 'help' | 'about' | 'experience' | 'projects' | 'education' | 'skills' | 'contact' | 'clear' | 'theme' | 'slideshow'
 
 interface CommandOutput {
   command: string
@@ -15,11 +15,9 @@ interface CommandOutput {
 
 const TerminalPrompt = ({
   onCommand,
-  commandHistory,
   onHistoryNavigate
 }: {
   onCommand: (cmd: string) => void
-  commandHistory: string[]
   onHistoryNavigate: (direction: 'up' | 'down') => string | null
 }) => {
   const [input, setInput] = useState('')
@@ -108,9 +106,6 @@ const TypewriterText = ({ text, delay = 20 }: { text: string; delay?: number }) 
   return <span>{displayText}</span>
 }
 
-const BlinkingCursor = () => (
-  <span className="animate-blink inline-block w-2 h-4 bg-green-400 ml-1"></span>
-)
 
 export default function TerminalTheme({ manifest }: ThemeProps) {
   const [history, setHistory] = useState<CommandOutput[]>([])
@@ -118,6 +113,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [theme, setTheme] = useState<'green' | 'amber' | 'cyan'>('green')
   const terminalRef = useRef<HTMLDivElement>(null)
+  const slideshowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { personalInfo, experience, projects, education, skills } = manifest
 
   const themeColors = {
@@ -153,7 +149,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
             <TypewriterText text={`Welcome to ${personalInfo.name}'s Portfolio Terminal`} />
           </div>
           <div className="text-gray-400">
-            <TypewriterText text={`Type 'help' to see available commands`} delay={15} />
+            <TypewriterText text={`Type 'slideshow' for auto-tour or 'help' for commands`} delay={15} />
           </div>
           <div className="text-gray-500 text-sm mt-2">
             <TypewriterText text="─────────────────────────────────────────" delay={5} />
@@ -193,6 +189,13 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
 
   const executeCommand = (cmd: string) => {
     const trimmedCmd = cmd.toLowerCase().trim()
+
+    // Stop slideshow if any command is typed
+    if (slideshowTimeoutRef.current && trimmedCmd !== '') {
+      clearTimeout(slideshowTimeoutRef.current)
+      slideshowTimeoutRef.current = null
+    }
+
     setCommandHistory(prev => [...prev, cmd])
     setHistoryIndex(-1)
 
@@ -211,6 +214,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
               <div><span className="text-white">education</span> - Display education history</div>
               <div><span className="text-white">skills</span> - Show technical skills</div>
               <div><span className="text-white">contact</span> - Get contact information</div>
+              <div><span className="text-white">slideshow</span> - Auto-play through all sections</div>
               <div><span className="text-white">theme [green|amber|cyan]</span> - Change terminal theme</div>
               <div><span className="text-white">clear</span> - Clear terminal screen</div>
             </div>
@@ -416,11 +420,82 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
         )
         break
 
+      case 'slideshow':
+        if (slideshowTimeoutRef.current) {
+          clearTimeout(slideshowTimeoutRef.current)
+          slideshowTimeoutRef.current = null
+        }
+
+        output = (
+          <div className="text-gray-300">
+            Starting slideshow... (Press Ctrl+C or type any command to stop)
+          </div>
+        )
+
+        const sections = ['about', 'experience', 'projects', 'education', 'skills', 'contact']
+        let currentSectionIndex = 0
+
+        const runSlideshow = () => {
+          if (currentSectionIndex < sections.length) {
+            executeCommand(sections[currentSectionIndex])
+            currentSectionIndex++
+            slideshowTimeoutRef.current = setTimeout(runSlideshow, 5000)
+          } else {
+            slideshowTimeoutRef.current = null
+            const endOutput: CommandOutput = {
+              command: '',
+              output: (
+                <div className={`${currentTheme.primary} text-center py-4`}>
+                  Slideshow complete! Type a command to continue.
+                </div>
+              ),
+              timestamp: Date.now()
+            }
+            setHistory(prev => [...prev, endOutput])
+          }
+        }
+
+        slideshowTimeoutRef.current = setTimeout(runSlideshow, 2000)
+        break
+
       case 'clear':
+        // Stop slideshow if running
+        if (slideshowTimeoutRef.current) {
+          clearTimeout(slideshowTimeoutRef.current)
+          slideshowTimeoutRef.current = null
+        }
+
         setHistory([])
+        // Add welcome message after a brief delay to allow state to update
+        setTimeout(() => {
+          const welcomeOutput: CommandOutput = {
+            command: '',
+            output: (
+              <div className="space-y-2">
+                <div className={`${currentTheme.primary} text-xl font-bold`}>
+                  <TypewriterText text={`Welcome to ${personalInfo.name}'s Portfolio Terminal`} />
+                </div>
+                <div className="text-gray-400">
+                  <TypewriterText text={`Type 'slideshow' for auto-tour or 'help' for commands`} delay={15} />
+                </div>
+                <div className="text-gray-500 text-sm mt-2">
+                  <TypewriterText text="─────────────────────────────────────────" delay={5} />
+                </div>
+              </div>
+            ),
+            timestamp: Date.now()
+          }
+          setHistory([welcomeOutput])
+        }, 50)
         return
 
       default:
+        // Stop slideshow on any command
+        if (slideshowTimeoutRef.current) {
+          clearTimeout(slideshowTimeoutRef.current)
+          slideshowTimeoutRef.current = null
+        }
+
         if (trimmedCmd.startsWith('theme ')) {
           const newTheme = trimmedCmd.split(' ')[1] as 'green' | 'amber' | 'cyan'
           if (['green', 'amber', 'cyan'].includes(newTheme)) {
@@ -446,63 +521,139 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
         }
     }
 
-    const newOutput: CommandOutput = {
-      command: cmd,
-      output,
-      timestamp: Date.now()
-    }
+    if (trimmedCmd !== 'slideshow') {
+      const newOutput: CommandOutput = {
+        command: cmd,
+        output,
+        timestamp: Date.now()
+      }
 
-    setHistory(prev => [...prev, newOutput])
+      setHistory(prev => [...prev, newOutput])
+    } else {
+      // For slideshow, add initial message
+      const newOutput: CommandOutput = {
+        command: cmd,
+        output,
+        timestamp: Date.now()
+      }
+      setHistory(prev => [...prev, newOutput])
+    }
   }
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (slideshowTimeoutRef.current) {
+        clearTimeout(slideshowTimeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-black text-white font-mono p-4 overflow-hidden">
-      {/* Terminal Window */}
-      <div className={`max-w-6xl mx-auto h-[calc(100vh-2rem)] flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
-        {/* Terminal Header */}
-        <div className={`flex items-center justify-between px-4 py-2 bg-gray-900 border-b ${currentTheme.border} rounded-t-lg`}>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer"></div>
+      <div className="flex gap-4 max-w-7xl mx-auto h-[calc(100vh-2rem)]">
+        {/* Help Commands Sidebar */}
+        <div className={`w-64 flex-shrink-0 border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950 p-4 overflow-y-auto`}>
+          <div className={`${currentTheme.primary} font-bold mb-4 text-lg`}>Commands</div>
+          <div className="space-y-3 text-sm">
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>help</div>
+              <div className="text-gray-400 text-xs">Show all commands</div>
             </div>
-            <span className="text-gray-400 text-sm ml-4">portfolio@terminal</span>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>about</div>
+              <div className="text-gray-400 text-xs">Personal info</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>experience</div>
+              <div className="text-gray-400 text-xs">Work history</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>projects</div>
+              <div className="text-gray-400 text-xs">Project portfolio</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>education</div>
+              <div className="text-gray-400 text-xs">Education history</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>skills</div>
+              <div className="text-gray-400 text-xs">Technical skills</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>contact</div>
+              <div className="text-gray-400 text-xs">Contact info</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>slideshow</div>
+              <div className="text-gray-400 text-xs">Auto-play sections</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>theme</div>
+              <div className="text-gray-400 text-xs">Change color theme</div>
+            </div>
+            <div className="space-y-1">
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>clear</div>
+              <div className="text-gray-400 text-xs">Clear terminal</div>
+            </div>
           </div>
-          <div className={`${currentTheme.primary} text-sm flex items-center gap-2`}>
-            <span className="animate-pulse">●</span>
-            <span>ONLINE</span>
+
+          <div className="mt-6 pt-4 border-t border-gray-800">
+            <div className="text-gray-500 text-xs space-y-2">
+              <div className={`${currentTheme.primary} font-semibold mb-2`}>Shortcuts</div>
+              <div><span className="text-gray-400">↑/↓</span> History</div>
+              <div><span className="text-gray-400">Ctrl+L</span> Clear</div>
+              <div><span className="text-gray-400">Ctrl+C</span> Cancel</div>
+            </div>
           </div>
         </div>
 
-        {/* Terminal Body */}
-        <div
-          ref={terminalRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
-        >
-          {history.map((item, idx) => (
-            <div key={idx} className="space-y-2">
-              {item.command && (
-                <div className="flex items-center gap-2">
-                  <span className={currentTheme.primary}>guest@portfolio</span>
-                  <span className="text-white">:</span>
-                  <span className="text-blue-400">~</span>
-                  <span className="text-white">$</span>
-                  <span className="text-white">{item.command}</span>
-                </div>
-              )}
-              <div className="pl-0 text-sm">{item.output}</div>
+        {/* Terminal Window */}
+        <div className={`flex-1 flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
+          {/* Terminal Header */}
+          <div className={`flex items-center justify-between px-4 py-2 bg-gray-900 border-b ${currentTheme.border} rounded-t-lg`}>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer"></div>
+              </div>
+              <span className="text-gray-400 text-sm ml-4">portfolio@terminal</span>
             </div>
-          ))}
-        </div>
+            <div className={`${currentTheme.primary} text-sm flex items-center gap-2`}>
+              <span className="animate-pulse">●</span>
+              <span>ONLINE</span>
+            </div>
+          </div>
 
-        {/* Terminal Input */}
-        <div className={`px-4 py-3 bg-gray-900 border-t ${currentTheme.border} rounded-b-lg`}>
-          <TerminalPrompt
-            onCommand={executeCommand}
-            commandHistory={commandHistory}
-            onHistoryNavigate={handleHistoryNavigate}
-          />
+          {/* Terminal Body */}
+          <div
+            ref={terminalRef}
+            className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+          >
+            {history.map((item, idx) => (
+              <div key={idx} className="space-y-2">
+                {item.command && (
+                  <div className="flex items-center gap-2">
+                    <span className={currentTheme.primary}>guest@portfolio</span>
+                    <span className="text-white">:</span>
+                    <span className="text-blue-400">~</span>
+                    <span className="text-white">$</span>
+                    <span className="text-white">{item.command}</span>
+                  </div>
+                )}
+                <div className="pl-0 text-sm">{item.output}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Terminal Input */}
+          <div className={`px-4 py-3 bg-gray-900 border-t ${currentTheme.border} rounded-b-lg`}>
+            <TerminalPrompt
+              onCommand={executeCommand}
+              onHistoryNavigate={handleHistoryNavigate}
+            />
+          </div>
         </div>
       </div>
 
