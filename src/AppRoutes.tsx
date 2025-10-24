@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { useUser } from './contexts/UserContext'
-import HomePage from './pages/HomePage'
-import Dashboard from './pages/Dashboard'
-import PublicPortfolio from './pages/PublicPortfolio'
-import ManifestInfoPage from './pages/ManifestInfoPage'
+
+const HomePage = lazy(() => import('./pages/HomePage'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const PublicPortfolio = lazy(() => import('./pages/PublicPortfolio'))
+const ManifestInfoPage = lazy(() => import('./pages/ManifestInfoPage'))
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useUser()
@@ -26,19 +28,27 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function AppRoutes() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/manifest-info" element={<ManifestInfoPage />} />
-        <Route path="/:username" element={<PublicPortfolio />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-xl font-mono">Loading...</div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/manifest-info" element={<ManifestInfoPage />} />
+          <Route path="/:username" element={<PublicPortfolio />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

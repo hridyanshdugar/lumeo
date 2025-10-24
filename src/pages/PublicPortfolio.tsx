@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams } from 'react-router-dom'
 import { api, PublicPortfolioResponse } from '../services/api'
 import { ThemeName } from '../App'
-import MinimalTheme from '../themes/MinimalTheme'
-import ModernTheme from '../themes/ModernTheme'
-import GradientTheme from '../themes/GradientTheme'
-import CyberTheme from '../themes/CyberTheme'
-import TerminalTheme from '../themes/TerminalTheme'
+
+const MinimalTheme = lazy(() => import('../themes/MinimalTheme'))
+const ModernTheme = lazy(() => import('../themes/ModernTheme'))
+const GradientTheme = lazy(() => import('../themes/GradientTheme'))
+const CyberTheme = lazy(() => import('../themes/CyberTheme'))
+const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 
 const themes = {
   minimal: MinimalTheme,
@@ -78,5 +79,15 @@ export default function PublicPortfolio() {
   const currentTheme = (portfolio.theme || 'minimal') as ThemeName
   const CurrentThemeComponent = themes[currentTheme]
 
-  return <CurrentThemeComponent manifest={portfolio.manifest} />
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-neutral-100">
+          <div className="text-xl text-neutral-800 font-mono">Loading theme...</div>
+        </div>
+      }
+    >
+      <CurrentThemeComponent manifest={portfolio.manifest} />
+    </Suspense>
+  )
 }

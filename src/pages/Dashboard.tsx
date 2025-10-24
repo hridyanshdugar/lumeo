@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useUser } from '../contexts/UserContext'
 import { ThemeName } from '../App'
 import { Link } from 'react-router-dom'
-import MinimalTheme from '../themes/MinimalTheme'
-import ModernTheme from '../themes/ModernTheme'
-import GradientTheme from '../themes/GradientTheme'
-import CyberTheme from '../themes/CyberTheme'
-import TerminalTheme from '../themes/TerminalTheme'
 import ManifestEditor from '../components/ManifestEditor'
 import Dialog from '../components/Dialog'
 import { PortfolioManifest } from '../types/manifest'
+
+const MinimalTheme = lazy(() => import('../themes/MinimalTheme'))
+const ModernTheme = lazy(() => import('../themes/ModernTheme'))
+const GradientTheme = lazy(() => import('../themes/GradientTheme'))
+const CyberTheme = lazy(() => import('../themes/CyberTheme'))
+const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 
 const themes = {
   minimal: MinimalTheme,
@@ -162,7 +163,15 @@ export default function Dashboard() {
 
           {/* Portfolio Preview with Scroll */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 bg-white">
-            <CurrentThemeComponent manifest={currentUser.manifest} />
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-xl font-mono">Loading theme...</div>
+                </div>
+              }
+            >
+              <CurrentThemeComponent manifest={currentUser.manifest} />
+            </Suspense>
           </div>
         </div>
 
