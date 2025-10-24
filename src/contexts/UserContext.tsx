@@ -50,7 +50,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const register = async (data: UserRegistration): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await api.register(data)
+      await api.register(data)
       await loadUserPortfolio()
       return { success: true }
     } catch (error) {
@@ -62,7 +62,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const login = async (data: UserLogin): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await api.login(data)
+      await api.login(data)
       await loadUserPortfolio()
       return { success: true }
     } catch (error) {

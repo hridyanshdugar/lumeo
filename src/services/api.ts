@@ -41,6 +41,8 @@ export interface LoginResponse {
 
 export interface PortfolioResponse {
   id: string
+  username: string
+  email: string
   theme: string
   manifest: PortfolioManifest
   is_public: boolean
@@ -49,7 +51,7 @@ export interface PortfolioResponse {
 }
 
 export interface PublicPortfolioResponse extends PortfolioResponse {
-  username: string
+  // Inherits username from PortfolioResponse
 }
 
 export const api = {

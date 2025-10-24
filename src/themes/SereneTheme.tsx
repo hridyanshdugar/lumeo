@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, animate, MotionValue, useMotionValue, useMotionValueEvent } from 'framer-motion'
+import { motion, animate, MotionValue, useMotionValue, useMotionValueEvent } from 'framer-motion'
 import { PortfolioManifest, Project } from '../types/manifest'
 import { useState, useEffect, useRef } from 'react'
 import Icon from '@mdi/react'
