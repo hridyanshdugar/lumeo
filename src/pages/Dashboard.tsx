@@ -12,6 +12,7 @@ const GradientTheme = lazy(() => import('../themes/GradientTheme'))
 const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 const SereneTheme = lazy(() => import('../themes/SereneTheme'))
+const GoogleTheme = lazy(() => import('../themes/GoogleTheme').then(module => ({ default: module.GoogleTheme })))
 
 const themes = {
   minimal: MinimalTheme,
@@ -20,6 +21,7 @@ const themes = {
   cyber: CyberTheme,
   terminal: TerminalTheme,
   serene: SereneTheme,
+  google: GoogleTheme,
 }
 
 export default function Dashboard() {

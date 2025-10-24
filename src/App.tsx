@@ -1,6 +1,6 @@
 import AppRoutes from './AppRoutes'
 
-export type ThemeName = 'minimal' | 'modern' | 'gradient' | 'cyber' | 'terminal' | 'serene'
+export type ThemeName = 'minimal' | 'modern' | 'gradient' | 'cyber' | 'terminal' | 'serene' | 'google'
 
 function App() {
   return <AppRoutes />
