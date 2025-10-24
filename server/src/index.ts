@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.js'
 import portfolioRoutes from './routes/portfolio.js'
+import sitemapRoutes from './routes/sitemap.js'
 
 dotenv.config()
 
@@ -16,6 +17,7 @@ app.use(express.json())
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/portfolio', portfolioRoutes)
+app.use('/', sitemapRoutes)
 
 // Health check
 app.get('/health', (req, res) => {

@@ -5,7 +5,8 @@
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Read(//Users/hridyanshdugar/Desktop/**)"
     ],
     "deny": [],
     "ask": []
