@@ -13,6 +13,7 @@ const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 const SereneTheme = lazy(() => import('../themes/SereneTheme'))
 const GoogleTheme = lazy(() => import('../themes/GoogleTheme').then(module => ({ default: module.GoogleTheme })))
+const NetflixTheme = lazy(() => import('../themes/NetflixTheme'))
 
 const themes = {
   minimal: MinimalTheme,
@@ -22,6 +23,7 @@ const themes = {
   terminal: TerminalTheme,
   serene: SereneTheme,
   google: GoogleTheme,
+  netflix: NetflixTheme,
 }
 
 export default function Dashboard() {

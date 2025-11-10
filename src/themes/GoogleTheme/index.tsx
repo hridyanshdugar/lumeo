@@ -67,7 +67,7 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
   }, [currentSection]);
 
   return (
-    <div className={`min-h-screen lg:overflow-hidden lg:max-h-screen transition-colors ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+    <div className={`transition-colors ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
       <AnimatePresence mode="wait">
@@ -79,7 +79,7 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-col items-center justify-center min-h-screen px-6"
+            className="flex flex-col items-center justify-center py-20 px-6"
           >
             <button
               onClick={() => setShowGame(false)}
