@@ -9,6 +9,7 @@ const GradientTheme = lazy(() => import('../themes/GradientTheme'))
 const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 const SereneTheme = lazy(() => import('../themes/SereneTheme'))
+const GoogleTheme = lazy(() => import('../themes/GoogleTheme').then(module => ({ default: module.GoogleTheme })))
 
 const themes = {
   minimal: MinimalTheme,
@@ -17,6 +18,7 @@ const themes = {
   cyber: CyberTheme,
   terminal: TerminalTheme,
   serene: SereneTheme,
+  google: GoogleTheme,
 }
 
 export default function PublicPortfolio() {
@@ -36,6 +38,8 @@ export default function PublicPortfolio() {
       try {
         const data = await api.getPublicPortfolio(username)
         setPortfolio(data)
+        // Update page title with portfolio name
+        document.title = `${data.manifest.personalInfo.name} - Portfolio`
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load portfolio')
       } finally {
@@ -45,6 +49,13 @@ export default function PublicPortfolio() {
 
     loadPortfolio()
   }, [username])
+
+  // Reset title when component unmounts
+  useEffect(() => {
+    return () => {
+      document.title = 'Portfolio Generator'
+    }
+  }, [])
 
   if (loading) {
     return (
