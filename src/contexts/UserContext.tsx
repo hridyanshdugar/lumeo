@@ -12,6 +12,7 @@ interface UserContextType {
   logout: () => void
   updateManifest: (manifest: PortfolioManifest) => Promise<void>
   updateTheme: (theme: string) => Promise<void>
+  toggleRandomTheme: () => Promise<void>
   loadUserPortfolio: () => Promise<void>
 }
 
@@ -35,7 +36,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
             password: '', // Not needed on frontend
             createdAt: portfolio.created_at,
             manifest: portfolio.manifest,
-            theme: portfolio.theme
+            theme: portfolio.theme,
+            randomTheme: portfolio.random_theme
           })
         } catch (error) {
           console.error('Failed to load user:', error)
@@ -87,7 +89,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         password: '',
         createdAt: portfolio.created_at,
         manifest: portfolio.manifest,
-        theme: portfolio.theme
+        theme: portfolio.theme,
+        randomTheme: portfolio.random_theme
       })
     } catch (error) {
       console.error('Failed to load portfolio:', error)
@@ -111,10 +114,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (!currentUser) return
 
     try {
-      await api.updatePortfolio({ theme })
-      setCurrentUser({ ...currentUser, theme })
+      await api.updatePortfolio({ theme, random_theme: false })
+      setCurrentUser({ ...currentUser, theme, randomTheme: false })
     } catch (error) {
       console.error('Failed to update theme:', error)
+      throw error
+    }
+  }
+
+  const toggleRandomTheme = async () => {
+    if (!currentUser) return
+
+    try {
+      const newRandomTheme = !currentUser.randomTheme
+      await api.updatePortfolio({ random_theme: newRandomTheme })
+      setCurrentUser({ ...currentUser, randomTheme: newRandomTheme })
+    } catch (error) {
+      console.error('Failed to toggle random theme:', error)
       throw error
     }
   }
@@ -130,6 +146,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         logout,
         updateManifest,
         updateTheme,
+        toggleRandomTheme,
         loadUserPortfolio
       }}
     >

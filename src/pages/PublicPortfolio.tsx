@@ -9,7 +9,7 @@ const GradientTheme = lazy(() => import('../themes/GradientTheme'))
 const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 const SereneTheme = lazy(() => import('../themes/SereneTheme'))
-const GoogleTheme = lazy(() => import('../themes/GoogleTheme').then(module => ({ default: module.GoogleTheme })))
+const GoogleTheme = lazy(() => import('../themes/GoogleTheme/index').then(module => ({ default: module.GoogleTheme })))
 
 const themes = {
   minimal: MinimalTheme,
@@ -26,6 +26,7 @@ export default function PublicPortfolio() {
   const [portfolio, setPortfolio] = useState<PublicPortfolioResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [displayTheme, setDisplayTheme] = useState<ThemeName>('minimal')
 
   useEffect(() => {
     const loadPortfolio = async () => {
@@ -38,6 +39,16 @@ export default function PublicPortfolio() {
       try {
         const data = await api.getPublicPortfolio(username)
         setPortfolio(data)
+
+        // If random theme is enabled, pick a random theme
+        if (data.random_theme) {
+          const themeKeys = Object.keys(themes) as ThemeName[]
+          const randomTheme = themeKeys[Math.floor(Math.random() * themeKeys.length)]
+          setDisplayTheme(randomTheme)
+        } else {
+          setDisplayTheme((data.theme || 'minimal') as ThemeName)
+        }
+
         // Update page title with portfolio name
         document.title = `${data.manifest.personalInfo.name} - Portfolio`
       } catch (err) {
@@ -89,8 +100,7 @@ export default function PublicPortfolio() {
     )
   }
 
-  const currentTheme = (portfolio.theme || 'minimal') as ThemeName
-  const CurrentThemeComponent = themes[currentTheme]
+  const CurrentThemeComponent = themes[displayTheme]
 
   return (
     <Suspense

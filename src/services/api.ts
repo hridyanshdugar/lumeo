@@ -44,6 +44,7 @@ export interface PortfolioResponse {
   username: string
   email: string
   theme: string
+  random_theme: boolean
   manifest: PortfolioManifest
   is_public: boolean
   created_at: string
@@ -117,6 +118,7 @@ export const api = {
     manifest?: PortfolioManifest
     theme?: string
     is_public?: boolean
+    random_theme?: boolean
   }): Promise<PortfolioResponse> {
     const token = getToken()
     if (!token) throw new Error('Not authenticated')

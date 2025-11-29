@@ -8,6 +8,7 @@ export interface User {
   createdAt: string
   manifest: PortfolioManifest
   theme: string
+  randomTheme?: boolean
 }
 
 export interface UserRegistration {

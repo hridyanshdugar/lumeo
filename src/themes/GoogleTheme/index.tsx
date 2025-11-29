@@ -67,7 +67,7 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
   }, [currentSection]);
 
   return (
-    <div className={`min-h-screen lg:overflow-hidden lg:max-h-screen transition-colors ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+    <div className={`relative min-h-screen lg:overflow-hidden lg:max-h-screen transition-colors ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
       <AnimatePresence mode="wait">

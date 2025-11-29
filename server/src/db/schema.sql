@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS portfolios (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL UNIQUE,
     theme TEXT DEFAULT 'minimal',
+    random_theme INTEGER DEFAULT 0,
     manifest TEXT NOT NULL,
     is_public INTEGER DEFAULT 1,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,

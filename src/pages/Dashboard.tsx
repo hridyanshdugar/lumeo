@@ -12,7 +12,7 @@ const GradientTheme = lazy(() => import('../themes/GradientTheme'))
 const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
 const SereneTheme = lazy(() => import('../themes/SereneTheme'))
-const GoogleTheme = lazy(() => import('../themes/GoogleTheme').then(module => ({ default: module.GoogleTheme })))
+const GoogleTheme = lazy(() => import('../themes/GoogleTheme/index').then(module => ({ default: module.GoogleTheme })))
 
 const themes = {
   minimal: MinimalTheme,
@@ -25,7 +25,7 @@ const themes = {
 }
 
 export default function Dashboard() {
-  const { currentUser, logout, updateManifest, updateTheme } = useUser()
+  const { currentUser, logout, updateManifest, updateTheme, toggleRandomTheme } = useUser()
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [dialog, setDialog] = useState<{ isOpen: boolean; title: string; message: string; type: 'error' | 'success' | 'info' }>({
@@ -74,6 +74,19 @@ export default function Dashboard() {
     }
   }
 
+  const handleRandomThemeToggle = async () => {
+    try {
+      await toggleRandomTheme()
+    } catch (error) {
+      setDialog({
+        isOpen: true,
+        title: 'RANDOM THEME TOGGLE FAILED',
+        message: 'Failed to toggle random theme. Please try again.',
+        type: 'error'
+      })
+    }
+  }
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(portfolioUrl)
     setCopied(true)
@@ -97,19 +110,30 @@ export default function Dashboard() {
           {/* Theme Selector */}
           <div className="mb-8">
             <h3 className="text-sm font-mono text-neutral-300 mb-3 tracking-wide uppercase px-2 py-1 bg-neutral-900 border-2 border-neutral-600 inline-block">Themes</h3>
-            <div className="mt-3 border-4 border-neutral-600 bg-neutral-900 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-600 scrollbar-track-neutral-900">
+            <button
+              onClick={handleRandomThemeToggle}
+              className={`w-full mt-3 mb-2 px-4 py-2 text-white border-4 transition-all font-mono tracking-wider uppercase shadow-sm ${
+                currentUser.randomTheme
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 border-purple-400 hover:from-purple-500 hover:to-pink-500'
+                  : 'bg-neutral-700 border-neutral-500 hover:bg-neutral-600'
+              }`}
+              style={{ imageRendering: 'pixelated' }}
+            >
+              🎲 Random Theme {currentUser.randomTheme ? '(ON)' : '(OFF)'}
+            </button>
+            <div className={`border-4 border-neutral-600 bg-neutral-900 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-600 scrollbar-track-neutral-900 ${currentUser.randomTheme ? 'opacity-50 pointer-events-none' : ''}`}>
               {Object.keys(themes).map((theme) => (
                 <button
                   key={theme}
                   onClick={() => handleThemeChange(theme as ThemeName)}
                   className={`w-full px-4 py-3 text-left capitalize transition-all font-mono tracking-wide border-b-2 border-neutral-700 last:border-b-0 ${
-                    currentTheme === theme
+                    currentTheme === theme && !currentUser.randomTheme
                       ? 'bg-neutral-600 text-white'
                       : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                   }`}
                   style={{ imageRendering: 'pixelated' }}
                 >
-                  <span className="mr-2">{currentTheme === theme ? '▶' : '◆'}</span>
+                  <span className="mr-2">{currentTheme === theme && !currentUser.randomTheme ? '▶' : '◆'}</span>
                   {theme}
                 </button>
               ))}

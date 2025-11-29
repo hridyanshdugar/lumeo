@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/auth.js'
 export const getMyPortfolio = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const result = db.prepare(
-      `SELECT p.id, p.theme, p.manifest, p.is_public, p.created_at, p.updated_at, u.username, u.email
+      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.is_public, p.created_at, p.updated_at, u.username, u.email
        FROM portfolios p
        JOIN users u ON p.user_id = u.id
        WHERE p.user_id = ?`
@@ -20,7 +20,8 @@ export const getMyPortfolio = async (req: AuthRequest, res: Response): Promise<v
     res.json({
       ...(result as any),
       manifest: JSON.parse((result as any).manifest),
-      is_public: Boolean((result as any).is_public)
+      is_public: Boolean((result as any).is_public),
+      random_theme: Boolean((result as any).random_theme)
     })
   } catch (error) {
     console.error('Get portfolio error:', error)
@@ -33,7 +34,7 @@ export const getPublicPortfolio = async (req: Request, res: Response): Promise<v
 
   try {
     const result = db.prepare(
-      `SELECT p.id, p.theme, p.manifest, p.created_at, p.updated_at, u.username
+      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.created_at, p.updated_at, u.username
        FROM portfolios p
        JOIN users u ON p.user_id = u.id
        WHERE u.username = ? AND p.is_public = 1`
@@ -46,7 +47,8 @@ export const getPublicPortfolio = async (req: Request, res: Response): Promise<v
 
     res.json({
       ...(result as any),
-      manifest: JSON.parse((result as any).manifest)
+      manifest: JSON.parse((result as any).manifest),
+      random_theme: Boolean((result as any).random_theme)
     })
   } catch (error) {
     console.error('Get public portfolio error:', error)
@@ -55,7 +57,7 @@ export const getPublicPortfolio = async (req: Request, res: Response): Promise<v
 }
 
 export const updatePortfolio = async (req: AuthRequest, res: Response): Promise<void> => {
-  const { manifest, theme, is_public } = req.body
+  const { manifest, theme, is_public, random_theme } = req.body
 
   try {
     const updates: string[] = []
@@ -76,6 +78,11 @@ export const updatePortfolio = async (req: AuthRequest, res: Response): Promise<
       values.push(is_public ? 1 : 0)
     }
 
+    if (random_theme !== undefined) {
+      updates.push('random_theme = ?')
+      values.push(random_theme ? 1 : 0)
+    }
+
     if (updates.length === 0) {
       res.status(400).json({ error: 'No fields to update' })
       return
@@ -93,7 +100,7 @@ export const updatePortfolio = async (req: AuthRequest, res: Response): Promise<
     stmt.run(...values)
 
     const portfolio = db.prepare(
-      'SELECT id, theme, manifest, is_public, updated_at FROM portfolios WHERE user_id = ?'
+      'SELECT id, theme, random_theme, manifest, is_public, updated_at FROM portfolios WHERE user_id = ?'
     ).get(req.userId)
 
     if (!portfolio) {
@@ -104,7 +111,8 @@ export const updatePortfolio = async (req: AuthRequest, res: Response): Promise<
     res.json({
       ...(portfolio as any),
       manifest: JSON.parse((portfolio as any).manifest),
-      is_public: Boolean((portfolio as any).is_public)
+      is_public: Boolean((portfolio as any).is_public),
+      random_theme: Boolean((portfolio as any).random_theme)
     })
   } catch (error) {
     console.error('Update portfolio error:', error)
