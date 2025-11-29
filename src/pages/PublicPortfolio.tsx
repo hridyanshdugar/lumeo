@@ -40,11 +40,15 @@ export default function PublicPortfolio() {
         const data = await api.getPublicPortfolio(username)
         setPortfolio(data)
 
-        // If random theme is enabled, pick a random theme
+        // If random theme is enabled, cycle through themes
         if (data.random_theme) {
           const themeKeys = Object.keys(themes) as ThemeName[]
-          const randomTheme = themeKeys[Math.floor(Math.random() * themeKeys.length)]
-          setDisplayTheme(randomTheme)
+          // Use a session counter to cycle through themes
+          const viewCount = sessionStorage.getItem(`theme-cycle-${username}`)
+          const count = viewCount ? parseInt(viewCount) : 0
+          const cycleTheme = themeKeys[count % themeKeys.length]
+          sessionStorage.setItem(`theme-cycle-${username}`, String(count + 1))
+          setDisplayTheme(cycleTheme)
         } else {
           setDisplayTheme((data.theme || 'minimal') as ThemeName)
         }
