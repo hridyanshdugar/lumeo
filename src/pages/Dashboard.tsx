@@ -112,14 +112,15 @@ export default function Dashboard() {
             <h3 className="text-sm font-mono text-neutral-300 mb-3 tracking-wide uppercase px-2 py-1 bg-neutral-900 border-2 border-neutral-600 inline-block">Themes</h3>
             <button
               onClick={handleRandomThemeToggle}
-              className={`w-full mt-3 mb-2 px-4 py-2 text-white border-4 transition-all font-mono tracking-wider uppercase shadow-sm ${
+              className={`w-full mt-3 mb-2 px-4 py-2 border-4 transition-all font-mono tracking-wider uppercase shadow-sm ${
                 currentUser.randomTheme
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 border-purple-400 hover:from-purple-500 hover:to-pink-500'
-                  : 'bg-neutral-700 border-neutral-500 hover:bg-neutral-600'
+                  ? 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500'
+                  : 'bg-neutral-800 text-neutral-300 border-neutral-600 hover:bg-neutral-700'
               }`}
               style={{ imageRendering: 'pixelated' }}
             >
-              🎲 Random Theme {currentUser.randomTheme ? '(ON)' : '(OFF)'}
+              <span className="mr-2">{currentUser.randomTheme ? '▶' : '◆'}</span>
+              Shuffle Themes
             </button>
             <div className={`border-4 border-neutral-600 bg-neutral-900 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-600 scrollbar-track-neutral-900 ${currentUser.randomTheme ? 'opacity-50 pointer-events-none' : ''}`}>
               {Object.keys(themes).map((theme) => (
