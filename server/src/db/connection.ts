@@ -10,7 +10,21 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Database file path
-const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), 'portfolio.db')
+// Use Railway volume mount if available, otherwise use current directory
+const getDbPath = () => {
+  if (process.env.DB_PATH) {
+    return process.env.DB_PATH
+  }
+  // Railway volumes are mounted at /data
+  // Use /data if we're on Railway (they set RAILWAY_ENVIRONMENT)
+  if (process.env.RAILWAY_ENVIRONMENT) {
+    return '/data/portfolio.db'
+  }
+  // Fallback to project root for local development
+  return path.join(process.cwd(), 'portfolio.db')
+}
+
+const DB_PATH = getDbPath()
 
 // Create database connection
 const db = new Database(DB_PATH, { verbose: console.log })

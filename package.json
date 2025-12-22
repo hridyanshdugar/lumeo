@@ -7,8 +7,10 @@
     "dev": "vite",
     "dev:server": "nodemon --watch server/src --exec tsx server/src/index.ts",
     "dev:all": "npm run dev & npm run dev:server",
-    "build": "tsc && vite build",
+    "build": "npm run build:server && npm run build:frontend",
+    "build:frontend": "vite build",
     "build:server": "tsc -p server/tsconfig.json",
+    "start": "NODE_ENV=production node server/dist/index.js",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
