@@ -5,12 +5,10 @@ const router = Router()
 
 router.get('/sitemap.xml', (req, res) => {
   try {
-    // Get the base URL from the request or environment variable
     const protocol = req.protocol
     const host = req.get('host')
     const baseUrl = process.env.BASE_URL || `${protocol}://${host}`
 
-    // Get all public portfolios from database
     const portfolios = db
       .prepare(
         `SELECT u.username, p.updated_at
@@ -20,7 +18,6 @@ router.get('/sitemap.xml', (req, res) => {
       )
       .all() as Array<{ username: string; updated_at: string }>
 
-    // Generate sitemap XML
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
@@ -43,7 +40,6 @@ ${portfolios
   .join('\n')}
 </urlset>`
 
-    // Set correct content type and send XML
     res.header('Content-Type', 'application/xml')
     res.send(sitemap)
   } catch (error) {

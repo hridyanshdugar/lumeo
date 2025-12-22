@@ -15,33 +15,34 @@ const PORT = process.env.PORT || 8080
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Middleware
 app.use(cors())
 app.use(express.json())
 
-// API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/portfolio', portfolioRoutes)
 app.use('/', sitemapRoutes)
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
 })
 
-// Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../../dist')
   app.use(express.static(frontendDistPath))
   
-  // Handle React routing - return all requests to React app
-  // Use parameter pattern that path-to-regexp accepts
-  app.get('/:path(.*)', (req, res) => {
-    // Don't serve index.html for API routes
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ error: 'Not found' })
+      return next()
     }
-    res.sendFile(path.join(frontendDistPath, 'index.html'))
+    if (req.method === 'GET') {
+      res.sendFile(path.join(frontendDistPath, 'index.html'), (err) => {
+        if (err) {
+          next(err)
+        }
+      })
+    } else {
+      next()
+    }
   })
 }
 

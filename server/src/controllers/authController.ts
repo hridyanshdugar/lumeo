@@ -9,7 +9,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this'
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, email, password } = req.body
 
-  // Validation
   if (!username || !email || !password) {
     res.status(400).json({ error: 'Username, email, and password are required' })
     return
@@ -21,24 +20,20 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Check if username already exists
     const usernameCheck = db.prepare('SELECT id FROM users WHERE username = ?').get(username)
     if (usernameCheck) {
       res.status(400).json({ error: 'Username already exists' })
       return
     }
 
-    // Check if email already exists
     const emailCheck = db.prepare('SELECT id FROM users WHERE email = ?').get(email)
     if (emailCheck) {
       res.status(400).json({ error: 'Email already exists' })
       return
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(password, 10)
 
-    // Create user
     const userId = randomUUID()
     const insertUser = db.prepare(
       'INSERT INTO users (id, username, email, password_hash) VALUES (?, ?, ?, ?)'
@@ -47,7 +42,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const user = db.prepare('SELECT id, username, email, created_at FROM users WHERE id = ?').get(userId)
 
-    // Create default portfolio with example data
     const defaultManifest = {
       personalInfo: {
         name: 'Your Name',
@@ -128,7 +122,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     )
     insertPortfolio.run(portfolioId, userId, JSON.stringify(defaultManifest), 'minimal')
 
-    // Generate JWT
     const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' })
 
     res.status(201).json({
@@ -155,7 +148,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Find user
     const user = db.prepare(
       'SELECT id, username, email, password_hash FROM users WHERE username = ?'
     ).get(username)
@@ -165,7 +157,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, (user as any).password_hash)
 
     if (!isValidPassword) {
@@ -173,7 +164,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    // Generate JWT
     const token = jwt.sign({ userId: (user as any).id }, JWT_SECRET, { expiresIn: '24h' })
 
     res.json({
