@@ -1,7 +1,7 @@
 import { PortfolioManifest } from '../types/manifest'
 import { UserRegistration, UserLogin } from '../types/user'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001')
 
 // Helper to get token from session storage
 const getToken = (): string | null => {
