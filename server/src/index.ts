@@ -35,7 +35,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendDistPath))
   
   // Handle React routing - return all requests to React app
-  app.get('/*', (req, res) => {
+  // Use parameter pattern that path-to-regexp accepts
+  app.get('/:path(.*)', (req, res) => {
     // Don't serve index.html for API routes
     if (req.path.startsWith('/api/')) {
       return res.status(404).json({ error: 'Not found' })
