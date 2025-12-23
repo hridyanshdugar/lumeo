@@ -7,7 +7,7 @@ type ThemeSelectorProps = {
   onClose: () => void // This prop is still needed for consistency, but its usage will be external
 }
 
-export default function ThemeSelector({ themes, currentTheme, onThemeChange, onClose }: ThemeSelectorProps) {
+export default function ThemeSelector({ themes, currentTheme, onThemeChange }: ThemeSelectorProps) {
   return (
     <div className="border-t-4 border-neutral-600 pt-4">
       <div className="flex border-b-4 border-neutral-600">
