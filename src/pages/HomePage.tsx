@@ -123,6 +123,10 @@ export default function HomePage() {
         <LoginScreen
           onLogin={handleLogin}
           onCancel={() => setShowLogin(false)}
+          onSwitchToRegister={() => {
+            setShowLogin(false)
+            setShowRegister(true)
+          }}
         />
       )}
 

@@ -1,16 +1,19 @@
-import { ThemeName } from '../App'
+import { useUser } from '../contexts/UserContext';
+import { ThemeName } from '../App';
 
 interface ThemeSwitcherProps {
-  currentTheme: ThemeName
-  onThemeChange: (theme: ThemeName) => void
-  themes: ThemeName[]
+  onThemeChange: (theme: ThemeName) => void;
+  themes: ThemeName[];
 }
 
-export default function ThemeSwitcher({ currentTheme, onThemeChange, themes }: ThemeSwitcherProps) {
+export default function ThemeSwitcher({ onThemeChange, themes }: ThemeSwitcherProps) {
+  const { currentUser } = useUser();
+  const currentTheme = currentUser?.theme || 'minimal';
+
   return (
-    <div className="fixed top-4 right-4 z-50 bg-black border-2 border-cyan-400/50 shadow-[0_0_30px_rgba(0,243,255,0.2)] p-2">
+    <div className="fixed top-4 right-4 z-50">
       <div className="flex gap-2">
-        {themes.map(theme => (
+        {themes.map((theme) => (
           <button
             key={theme}
             onClick={() => onThemeChange(theme)}
@@ -25,5 +28,5 @@ export default function ThemeSwitcher({ currentTheme, onThemeChange, themes }: T
         ))}
       </div>
     </div>
-  )
+  );
 }

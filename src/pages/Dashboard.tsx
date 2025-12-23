@@ -4,6 +4,7 @@ import { ThemeName } from '../App'
 import { Link } from 'react-router-dom'
 import ManifestEditor from '../components/ManifestEditor'
 import Dialog from '../components/Dialog'
+import ThemeSelector from '../components/ThemeSelector'
 import { PortfolioManifest } from '../types/manifest'
 
 const MinimalTheme = lazy(() => import('../themes/MinimalTheme'))
@@ -27,6 +28,7 @@ const themes = {
 export default function Dashboard() {
   const { currentUser, logout, updateManifest, updateTheme, toggleRandomTheme } = useUser()
   const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [isThemeSelectorPanelOpen, setIsThemeSelectorPanelOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [dialog, setDialog] = useState<{ isOpen: boolean; title: string; message: string; type: 'error' | 'success' | 'info' }>({
     isOpen: false,
@@ -94,7 +96,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-neutral-100 overflow-hidden">
+    <div className="flex h-screen bg-neutral-400 overflow-hidden">
       {/* Sidebar Control Panel */}
       <div
         className="fixed left-0 top-0 h-full bg-neutral-800 border-r-4 border-neutral-600 shadow-lg z-40"
@@ -107,56 +109,47 @@ export default function Dashboard() {
             <p className="text-neutral-400 text-sm font-mono">&gt; Dashboard</p>
           </div>
 
-          {/* Theme Selector */}
-          <div className="mb-8">
-            <h3 className="text-sm font-mono text-neutral-300 mb-3 tracking-wide uppercase px-2 py-1 bg-neutral-900 border-2 border-neutral-600 inline-block">Themes</h3>
-            <button
-              onClick={handleRandomThemeToggle}
-              className={`w-full mt-3 mb-2 px-4 py-2 border-4 transition-all font-mono tracking-wider uppercase shadow-sm ${
-                currentUser.randomTheme
-                  ? 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500'
-                  : 'bg-neutral-800 text-neutral-300 border-neutral-600 hover:bg-neutral-700'
-              }`}
-              style={{ imageRendering: 'pixelated' }}
-            >
-              <span className="mr-2">{currentUser.randomTheme ? '▶' : '◆'}</span>
-              Shuffle Themes
-            </button>
-            <div className={`border-4 border-neutral-600 bg-neutral-900 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-600 scrollbar-track-neutral-900 ${currentUser.randomTheme ? 'opacity-50 pointer-events-none' : ''}`}>
-              {Object.keys(themes).map((theme) => (
-                <button
-                  key={theme}
-                  onClick={() => handleThemeChange(theme as ThemeName)}
-                  className={`w-full px-4 py-3 text-left capitalize transition-all font-mono tracking-wide border-b-2 border-neutral-700 last:border-b-0 ${
-                    currentTheme === theme && !currentUser.randomTheme
-                      ? 'bg-neutral-600 text-white'
-                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                  }`}
-                  style={{ imageRendering: 'pixelated' }}
-                >
-                  <span className="mr-2">{currentTheme === theme && !currentUser.randomTheme ? '▶' : '◆'}</span>
-                  {theme}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Action Buttons */}
           <div className="space-y-3 flex-1">
             <button
-              onClick={() => setIsEditorOpen(true)}
-              className="w-full px-6 py-3 bg-neutral-600 text-white border-4 border-neutral-400 hover:bg-neutral-500 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
+              onClick={() => {
+                setIsEditorOpen(false)
+                setIsThemeSelectorPanelOpen(false)
+              }}
+              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
               style={{ imageRendering: 'pixelated' }}
             >
-              ▶ Edit Data
+              Preview
+            </button>
+
+            <button
+              onClick={() => {
+                setIsEditorOpen(true)
+                setIsThemeSelectorPanelOpen(false)
+              }}
+              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
+            >
+              Data
+            </button>
+
+            <button
+              onClick={() => {
+                setIsThemeSelectorPanelOpen(true)
+                setIsEditorOpen(false)
+              }}
+              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
+            >
+              Themes
             </button>
 
             <button
               onClick={logout}
-              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-500 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
+              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
               style={{ imageRendering: 'pixelated' }}
             >
-              ■ Logout
+              Logout
             </button>
           </div>
 
@@ -169,10 +162,10 @@ export default function Dashboard() {
       </div>
 
       {/* Main Preview + Editor Area */}
-      <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col gap-4 min-h-0">
+      <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col min-h-0">
         {/* Preview Window */}
         <div className={`border-4 border-neutral-600 flex flex-col transition-all duration-500 ease-in-out shadow-lg ${
-          isEditorOpen ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 flex-1'
+          (isEditorOpen || isThemeSelectorPanelOpen) ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 flex-1'
         } min-h-0`} style={{ imageRendering: 'pixelated' }}>
           {/* Preview Label */}
           <div className="bg-neutral-800 border-b-4 border-neutral-600 px-4 py-2 flex items-center justify-between flex-shrink-0">
@@ -240,6 +233,53 @@ export default function Dashboard() {
               manifest={currentUser.manifest}
               onSave={handleSaveManifest}
               onClose={() => setIsEditorOpen(false)}
+            />
+          </div>
+        </div>
+
+        {/* Theme Selector Window*/}
+        <div className={`border-4 border-neutral-600 flex flex-col transition-all duration-500 ease-in-out shadow-lg ${
+          isThemeSelectorPanelOpen ? 'flex-1 opacity-100' : 'h-0 opacity-0 overflow-hidden'
+        } min-h-0`} style={{ imageRendering: 'pixelated' }}>
+          {/* Theme Selector Header */}
+          <div className="bg-neutral-800 border-b-4 border-neutral-600 px-4 py-2 flex items-center justify-between flex-shrink-0">
+            <div>
+              <p className="text-neutral-300 font-mono text-sm uppercase">&gt; Theme Selector</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRandomThemeToggle}
+                className={`px-4 py-1.5 border-3 font-mono text-xs tracking-wider uppercase shadow-sm ${
+                  currentUser.randomTheme
+                    ? 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500'
+                    : 'bg-neutral-700 text-neutral-300 border-neutral-500 hover:bg-neutral-600'
+                }`}
+                style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
+              >
+                <span className="mr-2">{currentUser.randomTheme ? '▶' : '◆'}</span>
+                Shuffle Themes
+              </button>
+              <button
+                onClick={() => setIsThemeSelectorPanelOpen(false)}
+                className="text-white bg-neutral-700 hover:bg-neutral-600 text-xl font-bold w-8 h-8 flex items-center justify-center border-3 border-neutral-500 hover:shadow-md transition shadow-sm"
+                style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          {/* Theme Selector Content */}
+          <div className="flex-1 overflow-hidden p-4 min-h-0 bg-neutral-900">
+            <ThemeSelector
+              themes={themes}
+              currentTheme={currentTheme}
+              onThemeChange={(theme) => {
+                handleThemeChange(theme)
+                setIsThemeSelectorPanelOpen(false)
+              }}
+              onClose={() => setIsThemeSelectorPanelOpen(false)}
             />
           </div>
         </div>
