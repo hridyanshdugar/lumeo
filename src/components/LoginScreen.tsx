@@ -1,26 +1,27 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 interface LoginScreenProps {
-  onLogin: (username: string, password: string) => void
-  onCancel: () => void
+  onLogin: (username: string, password: string) => void;
+  onCancel: () => void;
+  onSwitchToRegister: () => void;
 }
 
-export default function LoginScreen({ onLogin, onCancel }: LoginScreenProps) {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+export default function LoginScreen({ onLogin, onCancel, onSwitchToRegister }: LoginScreenProps) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     if (!username || !password) {
-      setError('Please enter both username and password')
-      return
+      setError('Please enter both username and password');
+      return;
     }
 
-    onLogin(username, password)
-  }
+    onLogin(username, password);
+  };
 
   return (
     <div className="fixed inset-0 bg-neutral-900/90 z-50 flex items-center justify-center p-4" style={{ imageRendering: 'pixelated' }}>
@@ -94,7 +95,20 @@ export default function LoginScreen({ onLogin, onCancel }: LoginScreenProps) {
             </button>
           </div>
         </form>
+
+        {/* Switch to register */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-neutral-600 font-mono">
+            &gt; Don't have an account?{' '}
+            <button
+              onClick={onSwitchToRegister}
+              className="text-neutral-800 hover:text-neutral-600 font-medium underline"
+            >
+              Register here
+            </button>
+          </p>
+        </div>
       </div>
     </div>
-  )
+  );
 }

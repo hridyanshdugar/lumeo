@@ -589,7 +589,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
               <div className="text-gray-400 text-xs">Auto-play sections</div>
             </div>
             <div className="space-y-1">
-              <div className={`text-white font-semibold ${currentTheme.secondary}`}>theme</div>
+              <div className={`text-white font-semibold ${currentTheme.secondary}`}>theme [green|amber|cyan]</div>
               <div className="text-gray-400 text-xs">Change color theme</div>
             </div>
             <div className="space-y-1">
