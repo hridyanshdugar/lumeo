@@ -7,6 +7,20 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 const PublicPortfolio = lazy(() => import('./pages/PublicPortfolio'))
 const ManifestInfoPage = lazy(() => import('./pages/ManifestInfoPage'))
 
+// Check if we're on a subdomain (not www or main domain)
+function isOnSubdomain(): boolean {
+  const hostname = window.location.hostname
+  const parts = hostname.split('.')
+  
+  // subdomain.domain.tld = 3+ parts
+  if (parts.length >= 3) {
+    // 'www' is not a real subdomain
+    return parts[0] !== 'www'
+  }
+  
+  return false
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useUser()
 
@@ -25,6 +39,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// Renders HomePage on main domain, PublicPortfolio on subdomains
+function HomeOrPortfolio() {
+  if (isOnSubdomain()) {
+    return <PublicPortfolio />
+  }
+  return <HomePage />
+}
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -36,7 +58,7 @@ export default function AppRoutes() {
         }
       >
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomeOrPortfolio />} />
           <Route
             path="/dashboard"
             element={
