@@ -46,17 +46,14 @@ function validateSubdomain(subdomain: string): { valid: boolean; error?: string 
 }
 
 export default function DomainSettings({ currentSubdomain, username, onSave, onClose }: DomainSettingsProps) {
-  // Default to username if subdomain is not set
-  const defaultSubdomain = currentSubdomain || username.toLowerCase()
-  // Initialize with current subdomain value (show actual subdomain, not empty)
+  // Show the actual current subdomain value in the input (always show the value, even if it's the username)
   const [subdomain, setSubdomain] = useState(currentSubdomain || '')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
   useEffect(() => {
-    // Update subdomain when currentSubdomain changes
-    // Show the actual subdomain value (or empty if it's the default username)
+    // Update subdomain when currentSubdomain changes - always show the actual value
     setSubdomain(currentSubdomain || '')
   }, [currentSubdomain])
 
@@ -134,7 +131,7 @@ export default function DomainSettings({ currentSubdomain, username, onSave, onC
               type="text"
               value={subdomain}
               onChange={(e) => handleSubdomainChange(e.target.value)}
-              placeholder={currentSubdomain ? currentSubdomain : username.toLowerCase()}
+              placeholder={username.toLowerCase()}
               className="flex-1 px-4 py-2 bg-neutral-700 text-neutral-300 border-4 border-neutral-500 font-mono focus:outline-none focus:border-neutral-400"
               style={{ imageRendering: 'pixelated' }}
               disabled={isSaving}
@@ -179,9 +176,9 @@ export default function DomainSettings({ currentSubdomain, username, onSave, onC
         {/* Save Button */}
         <button
           onClick={handleSave}
-          disabled={isSaving || !!validationError || (subdomain.trim().toLowerCase() === (currentSubdomain || username.toLowerCase()).toLowerCase())}
+          disabled={isSaving || !!validationError || subdomain.trim().toLowerCase() === (currentSubdomain || '').toLowerCase()}
           className={`w-full px-6 py-3 font-mono tracking-wider uppercase border-4 transition-all ${
-            isSaving || !!validationError || (subdomain.trim().toLowerCase() === (currentSubdomain || username.toLowerCase()).toLowerCase())
+            isSaving || !!validationError || subdomain.trim().toLowerCase() === (currentSubdomain || '').toLowerCase()
               ? 'bg-neutral-700 text-neutral-500 border-neutral-600 cursor-not-allowed'
               : 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500 hover:shadow-md'
           }`}
