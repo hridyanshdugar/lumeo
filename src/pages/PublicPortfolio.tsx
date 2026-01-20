@@ -39,7 +39,10 @@ export default function PublicPortfolio() {
       
       if (parts.length > 2) {
         // Has subdomain (subdomain.domain.tld)
-        subdomain = parts[0]
+        // Skip 'www' - treat it as the main domain
+        if (parts[0] !== 'www') {
+          subdomain = parts[0]
+        }
       } else if (parts.length === 2 && parts[0] !== 'www' && !parts[0].includes(':')) {
         // Could be subdomain on localhost or similar
         const domain = parts.join('.')
