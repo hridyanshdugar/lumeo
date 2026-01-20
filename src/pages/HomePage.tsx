@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../contexts/UserContext'
 import LoginScreen from '../components/LoginScreen'
@@ -16,6 +16,13 @@ export default function HomePage() {
     message: '',
     type: 'info'
   })
+
+  // Redirect to dashboard if authenticated (use effect to avoid render-time navigation)
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard')
+    }
+  }, [isAuthenticated, navigate])
 
   const handleLogin = async (username: string, password: string) => {
     const result = await login({ username, password })
@@ -45,8 +52,8 @@ export default function HomePage() {
     }
   }
 
+  // Don't render if authenticated (will redirect via useEffect)
   if (isAuthenticated) {
-    navigate('/dashboard')
     return null
   }
 

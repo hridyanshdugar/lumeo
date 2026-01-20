@@ -18,13 +18,6 @@ export const getMyPortfolio = async (req: AuthRequest, res: Response): Promise<v
       return
     }
 
-    // If subdomain is null, set it to username (for existing users)
-    if (!(result as any).subdomain) {
-      const username = (result as any).username.toLowerCase()
-      db.prepare('UPDATE portfolios SET subdomain = ? WHERE user_id = ?').run(username, req.userId)
-      ;(result as any).subdomain = username
-    }
-
     res.json({
       ...(result as any),
       manifest: JSON.parse((result as any).manifest),
@@ -184,21 +177,9 @@ export const updateSubdomain = async (req: AuthRequest, res: Response): Promise<
   const { subdomain } = req.body
 
   try {
-    // Get username for default subdomain
-    const user = db.prepare('SELECT username FROM users WHERE id = ?').get(req.userId) as { username: string } | undefined
-    if (!user) {
-      res.status(404).json({ error: 'User not found' })
-      return
-    }
-
-    // If subdomain is null or empty, default to username
-    const finalSubdomain = (subdomain === null || subdomain === undefined || subdomain === '') 
-      ? user.username.toLowerCase() 
-      : subdomain
-
     // Validate subdomain format
-    if (finalSubdomain) {
-      const validation = validateSubdomain(finalSubdomain)
+    if (subdomain !== null && subdomain !== undefined && subdomain !== '') {
+      const validation = validateSubdomain(subdomain)
       if (!validation.valid) {
         res.status(400).json({ error: validation.error })
         return
@@ -207,7 +188,7 @@ export const updateSubdomain = async (req: AuthRequest, res: Response): Promise<
       // Check uniqueness (excluding current user's portfolio)
       const existing = db.prepare(
         `SELECT user_id FROM portfolios WHERE subdomain = ? AND user_id != ?`
-      ).get(finalSubdomain, req.userId)
+      ).get(subdomain, req.userId)
 
       if (existing) {
         res.status(409).json({ error: 'This subdomain is already taken' })
@@ -222,7 +203,7 @@ export const updateSubdomain = async (req: AuthRequest, res: Response): Promise<
        WHERE user_id = ?`
     )
 
-    stmt.run(finalSubdomain, req.userId)
+    stmt.run(subdomain || null, req.userId)
 
     // Get updated portfolio
     const portfolio = db.prepare(

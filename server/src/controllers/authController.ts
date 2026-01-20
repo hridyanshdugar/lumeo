@@ -117,7 +117,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     const portfolioId = randomUUID()
-    // Set subdomain to username by default
     const insertPortfolio = db.prepare(
       'INSERT INTO portfolios (id, user_id, manifest, theme, subdomain) VALUES (?, ?, ?, ?, ?)'
     )

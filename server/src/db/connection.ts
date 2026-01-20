@@ -61,20 +61,20 @@ const schema = fs.readFileSync(schemaPath, 'utf-8')
 // Run schema - this will create tables if they don't exist, or do nothing if they do
 db.exec(schema)
 
-// Migration: Set subdomain to username for existing portfolios without subdomain
+// Migration: Copy username to subdomain for all existing portfolios
 try {
-  const portfoliosWithoutSubdomain = db.prepare(`
+  const portfoliosToMigrate = db.prepare(`
     SELECT p.id, p.user_id, u.username
     FROM portfolios p
     JOIN users u ON p.user_id = u.id
     WHERE p.subdomain IS NULL OR p.subdomain = ''
   `).all() as Array<{ id: string; user_id: string; username: string }>
   
-  if (portfoliosWithoutSubdomain.length > 0) {
-    console.log(`Migrating: Setting subdomain to username for ${portfoliosWithoutSubdomain.length} existing portfolio(s)`)
+  if (portfoliosToMigrate.length > 0) {
+    console.log(`Migrating: Copying username to subdomain for ${portfoliosToMigrate.length} portfolio(s)`)
     const updateStmt = db.prepare('UPDATE portfolios SET subdomain = ? WHERE id = ?')
     
-    for (const portfolio of portfoliosWithoutSubdomain) {
+    for (const portfolio of portfoliosToMigrate) {
       try {
         const usernameLower = portfolio.username.toLowerCase()
         updateStmt.run(usernameLower, portfolio.id)
@@ -83,10 +83,10 @@ try {
         console.warn(`Could not set subdomain for portfolio ${portfolio.id}: ${error}`)
       }
     }
-    console.log('Migration completed: subdomain set to username for existing portfolios')
+    console.log('Migration completed: username copied to subdomain for existing portfolios')
   }
 } catch (error) {
-  console.error('Post-schema migration error:', error)
+  console.error('Migration error:', error)
 }
 
 console.log(`SQLite database initialized at: ${DB_PATH}`)
