@@ -120,7 +120,7 @@ export default function PublicPortfolio() {
           <h1 className="text-4xl font-bold text-neutral-800 mb-4 tracking-wider uppercase">Portfolio Not Found</h1>
           <p className="text-neutral-600 font-mono mb-8 max-w-md">&gt; {error || 'This portfolio does not exist or is not public.'}</p>
           <a
-            href="/"
+            href={`${window.location.protocol}//withlumeo.com`}
             className="inline-block px-8 py-3 bg-neutral-700 text-white border-4 border-neutral-500 hover:bg-neutral-600 hover:shadow-md transition font-mono tracking-wider uppercase shadow-sm"
             style={{ imageRendering: 'pixelated' }}
           >
