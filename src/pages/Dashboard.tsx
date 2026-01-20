@@ -99,6 +99,24 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleSubdomainSave = async (subdomain: string | null) => {
+    try {
+      await updateSubdomain(subdomain)
+    } catch (error) {
+      setDialog({
+        isOpen: true,
+        title: 'SUBDOMAIN UPDATE FAILED',
+        message: error instanceof Error ? error.message : 'Failed to update subdomain. Please try again.',
+        type: 'error'
+      })
+      throw error
+    }
+  }
+
+  const handleDomainPanelClose = () => {
+    setIsDomainPanelOpen(false)
+  }
+
   return (
     <div className="flex h-screen bg-neutral-400 overflow-hidden">
       {/* Sidebar Control Panel */}
@@ -329,20 +347,8 @@ export default function Dashboard() {
             <DomainSettings
               currentSubdomain={currentUser.subdomain}
               username={currentUser.username}
-              onSave={async (subdomain) => {
-                try {
-                  await updateSubdomain(subdomain)
-                } catch (error) {
-                  setDialog({
-                    isOpen: true,
-                    title: 'SUBDOMAIN UPDATE FAILED',
-                    message: error instanceof Error ? error.message : 'Failed to update subdomain. Please try again.',
-                    type: 'error'
-                  })
-                  throw error
-                }
-              }}
-              onClose={() => setIsDomainPanelOpen(false)}
+              onSave={handleSubdomainSave}
+              onClose={handleDomainPanelClose}
             />
           </div>
         </div>

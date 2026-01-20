@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, memo } from 'react'
 
 const RESERVED_SUBDOMAINS = [
   'www', 'api', 'admin', 'app', 'dashboard',
@@ -45,19 +45,16 @@ function validateSubdomain(subdomain: string): { valid: boolean; error?: string 
   return { valid: true }
 }
 
-export default function DomainSettings({ currentSubdomain, username, onSave, onClose }: DomainSettingsProps) {
-  // Show the actual current subdomain value in the input (always show the value, even if it's the username)
-  const [subdomain, setSubdomain] = useState(currentSubdomain || '')
+function DomainSettings({ currentSubdomain, username, onSave, onClose }: DomainSettingsProps) {
+  // Initialize with current subdomain value - only set once on mount
+  // Never update from props to prevent focus loss during re-renders
+  const [subdomain, setSubdomain] = useState(() => currentSubdomain || '')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  useEffect(() => {
-    // Update subdomain when currentSubdomain changes - always show the actual value
-    setSubdomain(currentSubdomain || '')
-  }, [currentSubdomain])
-
-  const handleSubdomainChange = (value: string) => {
+  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
     setSubdomain(value)
     setValidationError(null)
     setSaveSuccess(false)
@@ -92,6 +89,8 @@ export default function DomainSettings({ currentSubdomain, username, onSave, onC
     try {
       await onSave(subdomainToSave)
       setSaveSuccess(true)
+      // Update local state to match what was saved
+      setSubdomain(subdomainToSave || '')
       setTimeout(() => {
         setSaveSuccess(false)
       }, 3000)
@@ -130,7 +129,7 @@ export default function DomainSettings({ currentSubdomain, username, onSave, onC
             <input
               type="text"
               value={subdomain}
-              onChange={(e) => handleSubdomainChange(e.target.value)}
+              onChange={handleSubdomainChange}
               placeholder={username.toLowerCase()}
               className="flex-1 px-4 py-2 bg-neutral-700 text-neutral-300 border-4 border-neutral-500 font-mono focus:outline-none focus:border-neutral-400"
               style={{ imageRendering: 'pixelated' }}
@@ -190,3 +189,5 @@ export default function DomainSettings({ currentSubdomain, username, onSave, onC
     </div>
   )
 }
+
+export default memo(DomainSettings)

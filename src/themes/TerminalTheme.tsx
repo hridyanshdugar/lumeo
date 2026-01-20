@@ -15,10 +15,12 @@ interface CommandOutput {
 
 const TerminalPrompt = ({
   onCommand,
-  onHistoryNavigate
+  onHistoryNavigate,
+  containerRef
 }: {
   onCommand: (cmd: string) => void
   onHistoryNavigate: (direction: 'up' | 'down') => string | null
+  containerRef: React.RefObject<HTMLDivElement>
 }) => {
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -60,14 +62,20 @@ const TerminalPrompt = ({
     inputRef.current?.focus()
   }, [])
 
-  // Refocus input when clicking anywhere in terminal
+  // Refocus input when clicking within the terminal container only
   useEffect(() => {
-    const handleClick = () => {
-      inputRef.current?.focus()
+    const container = containerRef.current
+    if (!container) return
+
+    const handleClick = (e: MouseEvent) => {
+      // Only focus if clicking within the terminal container
+      if (container.contains(e.target as Node)) {
+        inputRef.current?.focus()
+      }
     }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
-  }, [])
+    container.addEventListener('click', handleClick)
+    return () => container.removeEventListener('click', handleClick)
+  }, [containerRef])
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2 font-mono">
@@ -113,6 +121,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [theme, setTheme] = useState<'green' | 'amber' | 'cyan'>('green')
   const terminalRef = useRef<HTMLDivElement>(null)
+  const terminalWindowRef = useRef<HTMLDivElement>(null)
   const slideshowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { personalInfo, experience, projects, education, skills } = manifest
 
@@ -609,7 +618,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
         </div>
 
         {/* Terminal Window */}
-        <div className={`flex-1 flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
+        <div ref={terminalWindowRef} className={`flex-1 flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
           {/* Terminal Header */}
           <div className={`flex items-center justify-between px-4 py-2 bg-gray-900 border-b ${currentTheme.border} rounded-t-lg`}>
             <div className="flex items-center gap-2">
@@ -652,6 +661,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
             <TerminalPrompt
               onCommand={executeCommand}
               onHistoryNavigate={handleHistoryNavigate}
+              containerRef={terminalWindowRef}
             />
           </div>
         </div>
