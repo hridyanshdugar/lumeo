@@ -46,7 +46,8 @@ export default function AppRoutes() {
             }
           />
           <Route path="/manifest-info" element={<ManifestInfoPage />} />
-          <Route path="/:username" element={<PublicPortfolio />} />
+          {/* PublicPortfolio is now accessed via subdomain, not route */}
+          <Route path="*" element={<PublicPortfolio />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

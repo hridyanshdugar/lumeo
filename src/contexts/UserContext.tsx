@@ -13,6 +13,7 @@ interface UserContextType {
   updateManifest: (manifest: PortfolioManifest) => Promise<void>
   updateTheme: (theme: string) => Promise<void>
   toggleRandomTheme: () => Promise<void>
+  updateSubdomain: (subdomain: string | null) => Promise<void>
   loadUserPortfolio: () => Promise<void>
 }
 
@@ -37,7 +38,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
             createdAt: portfolio.created_at,
             manifest: portfolio.manifest,
             theme: portfolio.theme,
-            randomTheme: portfolio.random_theme
+            randomTheme: portfolio.random_theme,
+            subdomain: portfolio.subdomain
           })
         } catch (error) {
           console.error('Failed to load user:', error)
@@ -90,7 +92,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         createdAt: portfolio.created_at,
         manifest: portfolio.manifest,
         theme: portfolio.theme,
-        randomTheme: portfolio.random_theme
+        randomTheme: portfolio.random_theme,
+        subdomain: portfolio.subdomain
       })
     } catch (error) {
       console.error('Failed to load portfolio:', error)
@@ -135,6 +138,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const updateSubdomain = async (subdomain: string | null) => {
+    if (!currentUser) return
+
+    try {
+      const portfolio = await api.updateSubdomain(subdomain)
+      setCurrentUser({ ...currentUser, subdomain: portfolio.subdomain })
+    } catch (error) {
+      console.error('Failed to update subdomain:', error)
+      throw error
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -147,6 +162,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         updateManifest,
         updateTheme,
         toggleRandomTheme,
+        updateSubdomain,
         loadUserPortfolio
       }}
     >

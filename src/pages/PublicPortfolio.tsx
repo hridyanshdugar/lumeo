@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { api, PublicPortfolioResponse } from '../services/api'
 import { ThemeName } from '../App'
 
@@ -22,7 +22,7 @@ const themes = {
 }
 
 export default function PublicPortfolio() {
-  const { username } = useParams<{ username: string }>()
+  const navigate = useNavigate()
   const [portfolio, setPortfolio] = useState<PublicPortfolioResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -30,24 +30,48 @@ export default function PublicPortfolio() {
 
   useEffect(() => {
     const loadPortfolio = async () => {
-      if (!username) {
-        setError('No username provided')
+      // Extract subdomain from hostname
+      const hostname = window.location.hostname
+      const parts = hostname.split('.')
+      
+      // Extract subdomain (e.g., subdomain.withlumeo.com -> subdomain)
+      let subdomain: string | null = null
+      
+      if (parts.length > 2) {
+        // Has subdomain (subdomain.domain.tld)
+        subdomain = parts[0]
+      } else if (parts.length === 2 && parts[0] !== 'www' && !parts[0].includes(':')) {
+        // Could be subdomain on localhost or similar
+        const domain = parts.join('.')
+        if (domain !== 'withlumeo.com' && domain !== 'localhost') {
+          subdomain = parts[0]
+        }
+      }
+
+      // If on main domain (withlumeo.com) with no subdomain, redirect to home
+      if (!subdomain && (hostname === 'withlumeo.com' || hostname === 'www.withlumeo.com')) {
+        navigate('/', { replace: true })
+        return
+      }
+
+      if (!subdomain) {
+        setError('No subdomain detected. Please access your portfolio via your custom subdomain.')
         setLoading(false)
         return
       }
 
       try {
-        const data = await api.getPublicPortfolio(username)
+        const data = await api.getPublicPortfolioBySubdomain(subdomain)
         setPortfolio(data)
 
         // If random theme is enabled, cycle through themes
         if (data.random_theme) {
           const themeKeys = Object.keys(themes) as ThemeName[]
           // Use a session counter to cycle through themes
-          const viewCount = sessionStorage.getItem(`theme-cycle-${username}`)
+          const viewCount = sessionStorage.getItem(`theme-cycle-${subdomain}`)
           const count = viewCount ? parseInt(viewCount) : 0
           const cycleTheme = themeKeys[count % themeKeys.length]
-          sessionStorage.setItem(`theme-cycle-${username}`, String(count + 1))
+          sessionStorage.setItem(`theme-cycle-${subdomain}`, String(count + 1))
           setDisplayTheme(cycleTheme)
         } else {
           setDisplayTheme((data.theme || 'minimal') as ThemeName)
@@ -63,7 +87,7 @@ export default function PublicPortfolio() {
     }
 
     loadPortfolio()
-  }, [username])
+  }, [])
 
   // Reset title when component unmounts
   useEffect(() => {

@@ -9,6 +9,7 @@ export interface User {
   manifest: PortfolioManifest
   theme: string
   randomTheme?: boolean
+  subdomain?: string | null
 }
 
 export interface UserRegistration {

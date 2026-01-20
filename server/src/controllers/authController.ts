@@ -118,9 +118,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const portfolioId = randomUUID()
     const insertPortfolio = db.prepare(
-      'INSERT INTO portfolios (id, user_id, manifest, theme) VALUES (?, ?, ?, ?)'
+      'INSERT INTO portfolios (id, user_id, manifest, theme, subdomain) VALUES (?, ?, ?, ?, ?)'
     )
-    insertPortfolio.run(portfolioId, userId, JSON.stringify(defaultManifest), 'minimal')
+    insertPortfolio.run(portfolioId, userId, JSON.stringify(defaultManifest), 'minimal', username.toLowerCase())
 
     const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' })
 

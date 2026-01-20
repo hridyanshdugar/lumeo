@@ -2,11 +2,12 @@ import { Request, Response } from 'express'
 import { randomUUID } from 'crypto'
 import db from '../db/connection.js'
 import { AuthRequest } from '../middleware/auth.js'
+import { SubdomainRequest, validateSubdomain } from '../middleware/subdomain.js'
 
 export const getMyPortfolio = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const result = db.prepare(
-      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.is_public, p.created_at, p.updated_at, u.username, u.email
+      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.is_public, p.subdomain, p.created_at, p.updated_at, u.username, u.email
        FROM portfolios p
        JOIN users u ON p.user_id = u.id
        WHERE p.user_id = ?`
@@ -137,5 +138,94 @@ export const getAllPublicPortfolios = async (req: Request, res: Response): Promi
   } catch (error) {
     console.error('Get all portfolios error:', error)
     res.status(500).json({ error: 'Failed to fetch portfolios' })
+  }
+}
+
+export const getPortfolioBySubdomain = async (req: SubdomainRequest, res: Response): Promise<void> => {
+  const subdomain = req.subdomain
+
+  if (!subdomain) {
+    res.status(400).json({ error: 'No subdomain provided' })
+    return
+  }
+
+  try {
+    const result = db.prepare(
+      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.created_at, p.updated_at, u.username
+       FROM portfolios p
+       JOIN users u ON p.user_id = u.id
+       WHERE p.subdomain = ? AND p.is_public = 1`
+    ).get(subdomain)
+
+    if (!result) {
+      res.status(404).json({ error: 'Portfolio not found or not public' })
+      return
+    }
+
+    res.json({
+      ...(result as any),
+      manifest: JSON.parse((result as any).manifest),
+      random_theme: Boolean((result as any).random_theme)
+    })
+  } catch (error) {
+    console.error('Get portfolio by subdomain error:', error)
+    res.status(500).json({ error: 'Failed to fetch portfolio' })
+  }
+}
+
+export const updateSubdomain = async (req: AuthRequest, res: Response): Promise<void> => {
+  const { subdomain } = req.body
+
+  try {
+    // Validate subdomain format
+    if (subdomain !== null && subdomain !== undefined && subdomain !== '') {
+      const validation = validateSubdomain(subdomain)
+      if (!validation.valid) {
+        res.status(400).json({ error: validation.error })
+        return
+      }
+
+      // Check uniqueness (excluding current user's portfolio)
+      const existing = db.prepare(
+        `SELECT user_id FROM portfolios WHERE subdomain = ? AND user_id != ?`
+      ).get(subdomain, req.userId)
+
+      if (existing) {
+        res.status(409).json({ error: 'This subdomain is already taken' })
+        return
+      }
+    }
+
+    // Update subdomain
+    const stmt = db.prepare(
+      `UPDATE portfolios
+       SET subdomain = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = ?`
+    )
+
+    stmt.run(subdomain || null, req.userId)
+
+    // Get updated portfolio
+    const portfolio = db.prepare(
+      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.is_public, p.subdomain, p.updated_at, u.username, u.email
+       FROM portfolios p
+       JOIN users u ON p.user_id = u.id
+       WHERE p.user_id = ?`
+    ).get(req.userId)
+
+    if (!portfolio) {
+      res.status(404).json({ error: 'Portfolio not found' })
+      return
+    }
+
+    res.json({
+      ...(portfolio as any),
+      manifest: JSON.parse((portfolio as any).manifest),
+      is_public: Boolean((portfolio as any).is_public),
+      random_theme: Boolean((portfolio as any).random_theme)
+    })
+  } catch (error) {
+    console.error('Update subdomain error:', error)
+    res.status(500).json({ error: 'Failed to update subdomain' })
   }
 }
