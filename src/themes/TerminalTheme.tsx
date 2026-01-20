@@ -16,14 +16,13 @@ interface CommandOutput {
 const TerminalPrompt = ({
   onCommand,
   onHistoryNavigate,
-  containerRef
+  inputRef
 }: {
   onCommand: (cmd: string) => void
   onHistoryNavigate: (direction: 'up' | 'down') => string | null
-  containerRef: React.RefObject<HTMLDivElement>
+  inputRef: React.RefObject<HTMLInputElement>
 }) => {
   const [input, setInput] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,17 +36,11 @@ const TerminalPrompt = ({
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       const historyCmd = onHistoryNavigate('up')
-      if (historyCmd !== null) {
-        setInput(historyCmd)
-      }
+      if (historyCmd !== null) setInput(historyCmd)
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       const historyCmd = onHistoryNavigate('down')
-      if (historyCmd !== null) {
-        setInput(historyCmd)
-      } else {
-        setInput('')
-      }
+      setInput(historyCmd ?? '')
     } else if (e.key === 'l' && e.ctrlKey) {
       e.preventDefault()
       onCommand('clear')
@@ -60,22 +53,7 @@ const TerminalPrompt = ({
 
   useEffect(() => {
     inputRef.current?.focus()
-  }, [])
-
-  // Refocus input when clicking within the terminal container only
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const handleClick = (e: MouseEvent) => {
-      // Only focus if clicking within the terminal container
-      if (container.contains(e.target as Node)) {
-        inputRef.current?.focus()
-      }
-    }
-    container.addEventListener('click', handleClick)
-    return () => container.removeEventListener('click', handleClick)
-  }, [containerRef])
+  }, [inputRef])
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2 font-mono">
@@ -121,7 +99,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [theme, setTheme] = useState<'green' | 'amber' | 'cyan'>('green')
   const terminalRef = useRef<HTMLDivElement>(null)
-  const terminalWindowRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const slideshowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { personalInfo, experience, projects, education, skills } = manifest
 
@@ -618,7 +596,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
         </div>
 
         {/* Terminal Window */}
-        <div ref={terminalWindowRef} className={`flex-1 flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
+        <div onClick={() => inputRef.current?.focus()} className={`flex-1 flex flex-col border-2 ${currentTheme.border} rounded-lg shadow-2xl ${currentTheme.shadow} bg-gray-950`}>
           {/* Terminal Header */}
           <div className={`flex items-center justify-between px-4 py-2 bg-gray-900 border-b ${currentTheme.border} rounded-t-lg`}>
             <div className="flex items-center gap-2">
@@ -661,7 +639,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
             <TerminalPrompt
               onCommand={executeCommand}
               onHistoryNavigate={handleHistoryNavigate}
-              containerRef={terminalWindowRef}
+              inputRef={inputRef}
             />
           </div>
         </div>

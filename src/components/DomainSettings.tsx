@@ -1,193 +1,109 @@
-import { useState, memo } from 'react'
+import { useState } from 'react'
 
-const RESERVED_SUBDOMAINS = [
-  'www', 'api', 'admin', 'app', 'dashboard',
-  'mail', 'ftp', 'localhost', 'test', 'staging',
-  'dev', 'blog', 'docs', 'help', 'support'
-]
-
+const RESERVED_SUBDOMAINS = ['www', 'api', 'admin', 'app', 'dashboard', 'mail', 'ftp', 'localhost', 'test', 'staging', 'dev', 'blog', 'docs', 'help', 'support']
 const DOMAIN = 'withlumeo.com'
 
-interface DomainSettingsProps {
+interface Props {
   currentSubdomain: string | null | undefined
   username: string
   onSave: (subdomain: string | null) => Promise<void>
-  onClose: () => void
 }
 
-function validateSubdomain(subdomain: string): { valid: boolean; error?: string } {
-  if (!subdomain || subdomain.trim() === '') {
-    return { valid: true } // Empty is allowed (to remove subdomain)
-  }
-
-  const trimmed = subdomain.trim().toLowerCase()
-
-  // Check length
-  if (trimmed.length < 3 || trimmed.length > 63) {
-    return { valid: false, error: 'Subdomain must be between 3 and 63 characters' }
-  }
-
-  // Check format: lowercase alphanumeric and hyphens only
-  if (!/^[a-z0-9-]+$/.test(trimmed)) {
-    return { valid: false, error: 'Subdomain can only contain lowercase letters, numbers, and hyphens' }
-  }
-
-  // Cannot start or end with hyphen
-  if (trimmed.startsWith('-') || trimmed.endsWith('-')) {
-    return { valid: false, error: 'Subdomain cannot start or end with a hyphen' }
-  }
-
-  // Check reserved subdomains
-  if (RESERVED_SUBDOMAINS.includes(trimmed)) {
-    return { valid: false, error: 'This subdomain is reserved and cannot be used' }
-  }
-
-  return { valid: true }
+function validate(subdomain: string): string | null {
+  if (!subdomain) return null
+  const s = subdomain.trim().toLowerCase()
+  if (s.length < 3 || s.length > 63) return 'Must be 3-63 characters'
+  if (!/^[a-z0-9-]+$/.test(s)) return 'Only lowercase letters, numbers, and hyphens'
+  if (s.startsWith('-') || s.endsWith('-')) return 'Cannot start or end with hyphen'
+  if (RESERVED_SUBDOMAINS.includes(s)) return 'This subdomain is reserved'
+  return null
 }
 
-function DomainSettings({ currentSubdomain, username, onSave, onClose }: DomainSettingsProps) {
-  // Initialize with current subdomain value - only set once on mount
-  // Never update from props to prevent focus loss during re-renders
-  const [subdomain, setSubdomain] = useState(() => currentSubdomain || '')
-  const [validationError, setValidationError] = useState<string | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveSuccess, setSaveSuccess] = useState(false)
+export default function DomainSettings({ currentSubdomain, username, onSave }: Props) {
+  const [subdomain, setSubdomain] = useState(currentSubdomain || '')
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setSubdomain(value)
-    setValidationError(null)
-    setSaveSuccess(false)
-
-    if (value.trim() !== '') {
-      const validation = validateSubdomain(value)
-      if (!validation.valid) {
-        setValidationError(validation.error || 'Invalid subdomain')
-      }
-    }
+    setError(validate(value))
+    setSuccess(false)
   }
 
   const handleSave = async () => {
-    const trimmed = subdomain.trim().toLowerCase()
-    
-    // If empty, send null to use default (username)
-    const subdomainToSave = trimmed === '' ? null : trimmed
-    
-    // Validate (only if not empty)
-    if (subdomainToSave) {
-      const validation = validateSubdomain(subdomainToSave)
-      if (!validation.valid) {
-        setValidationError(validation.error || 'Invalid subdomain')
-        return
-      }
-    }
+    const value = subdomain.trim().toLowerCase() || null
+    if (value && validate(value)) return
 
-    setIsSaving(true)
-    setValidationError(null)
-    setSaveSuccess(false)
-
+    setSaving(true)
+    setError(null)
     try {
-      await onSave(subdomainToSave)
-      setSaveSuccess(true)
-      // Update local state to match what was saved
-      setSubdomain(subdomainToSave || '')
-      setTimeout(() => {
-        setSaveSuccess(false)
-      }, 3000)
-    } catch (error) {
-      setValidationError(error instanceof Error ? error.message : 'Failed to save subdomain')
+      await onSave(value)
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to save')
     } finally {
-      setIsSaving(false)
+      setSaving(false)
     }
   }
 
-  const fullUrl = subdomain && subdomain.trim() !== ''
-    ? `https://${subdomain.trim().toLowerCase()}.${DOMAIN}`
-    : 'No subdomain set'
+  const current = currentSubdomain || username.toLowerCase()
+  const preview = subdomain.trim().toLowerCase() || current
+  const unchanged = preview === current
 
   return (
-    <div className="border-t-4 border-neutral-600 pt-4">
-      <div className="space-y-4">
-        {/* Current Subdomain Display */}
-        <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
-          <p className="text-neutral-400 text-sm font-mono uppercase mb-2">&gt; Current Subdomain</p>
-          <p className="text-neutral-300 font-mono text-lg">
-            {currentSubdomain || username.toLowerCase()}
-            {!currentSubdomain && <span className="text-neutral-500 text-sm ml-2">(default: username)</span>}
-          </p>
-          <p className="text-neutral-400 font-mono text-sm mt-2">
-            {`https://${currentSubdomain || username.toLowerCase()}.${DOMAIN}`}
-          </p>
-        </div>
-
-        {/* Input Field */}
-        <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
-          <label className="block text-neutral-300 font-mono text-sm uppercase mb-2">
-            &gt; Subdomain
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={subdomain}
-              onChange={handleSubdomainChange}
-              placeholder={username.toLowerCase()}
-              className="flex-1 px-4 py-2 bg-neutral-700 text-neutral-300 border-4 border-neutral-500 font-mono focus:outline-none focus:border-neutral-400"
-              style={{ imageRendering: 'pixelated' }}
-              disabled={isSaving}
-            />
-            <span className="text-neutral-400 font-mono">.{DOMAIN}</span>
-          </div>
-          {subdomain && subdomain.trim() !== '' && (
-            <p className="text-neutral-500 font-mono text-xs mt-2">
-              Preview: {fullUrl}
-            </p>
-          )}
-        </div>
-
-        {/* Validation Error */}
-        {validationError && (
-          <div className="bg-red-900 border-4 border-red-700 p-4">
-            <p className="text-red-200 font-mono text-sm uppercase">&gt; Error</p>
-            <p className="text-red-300 font-mono text-sm mt-1">{validationError}</p>
-          </div>
-        )}
-
-        {/* Success Message */}
-        {saveSuccess && (
-          <div className="bg-green-900 border-4 border-green-700 p-4">
-            <p className="text-green-200 font-mono text-sm uppercase">&gt; Success</p>
-            <p className="text-green-300 font-mono text-sm mt-1">Subdomain updated successfully!</p>
-          </div>
-        )}
-
-        {/* Help Text */}
-        <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
-          <p className="text-neutral-400 font-mono text-xs uppercase mb-2">&gt; Rules</p>
-          <ul className="text-neutral-500 font-mono text-xs space-y-1 list-disc list-inside">
-            <li>3-63 characters</li>
-            <li>Lowercase letters, numbers, and hyphens only</li>
-            <li>Cannot start or end with hyphen</li>
-            <li>Default subdomain is your username: <span className="text-neutral-300">{username.toLowerCase()}</span></li>
-            <li>Leave empty to use default (username)</li>
-          </ul>
-        </div>
-
-        {/* Save Button */}
-        <button
-          onClick={handleSave}
-          disabled={isSaving || !!validationError || subdomain.trim().toLowerCase() === (currentSubdomain || '').toLowerCase()}
-          className={`w-full px-6 py-3 font-mono tracking-wider uppercase border-4 transition-all ${
-            isSaving || !!validationError || subdomain.trim().toLowerCase() === (currentSubdomain || '').toLowerCase()
-              ? 'bg-neutral-700 text-neutral-500 border-neutral-600 cursor-not-allowed'
-              : 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500 hover:shadow-md'
-          }`}
-          style={{ imageRendering: 'pixelated' }}
-        >
-          {isSaving ? 'Saving...' : 'Save Subdomain'}
-        </button>
+    <div className="space-y-4">
+      {/* Current */}
+      <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
+        <p className="text-neutral-400 text-sm font-mono uppercase mb-1">&gt; Current</p>
+        <p className="text-neutral-300 font-mono">{current}.{DOMAIN}</p>
       </div>
+
+      {/* Input */}
+      <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
+        <label className="block text-neutral-300 font-mono text-sm uppercase mb-2">&gt; New Subdomain</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={subdomain}
+            onChange={handleChange}
+            placeholder={username.toLowerCase()}
+            disabled={saving}
+            className="flex-1 px-4 py-2 bg-neutral-700 text-neutral-300 border-4 border-neutral-500 font-mono focus:outline-none focus:border-neutral-400"
+          />
+          <span className="text-neutral-400 font-mono">.{DOMAIN}</span>
+        </div>
+        {subdomain && <p className="text-neutral-500 font-mono text-xs mt-2">Preview: {preview}.{DOMAIN}</p>}
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="bg-red-900 border-4 border-red-700 p-3">
+          <p className="text-red-300 font-mono text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* Success */}
+      {success && (
+        <div className="bg-green-900 border-4 border-green-700 p-3">
+          <p className="text-green-300 font-mono text-sm">Subdomain updated!</p>
+        </div>
+      )}
+
+      {/* Save */}
+      <button
+        onClick={handleSave}
+        disabled={saving || !!error || unchanged}
+        className={`w-full px-6 py-3 font-mono uppercase border-4 transition-all ${
+          saving || !!error || unchanged
+            ? 'bg-neutral-700 text-neutral-500 border-neutral-600 cursor-not-allowed'
+            : 'bg-neutral-600 text-white border-neutral-400 hover:bg-neutral-500'
+        }`}
+      >
+        {saving ? 'Saving...' : 'Save'}
+      </button>
     </div>
   )
 }
-
-export default memo(DomainSettings)
