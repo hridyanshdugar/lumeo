@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import ManifestEditor from '../components/ManifestEditor'
 import Dialog from '../components/Dialog'
 import ThemeSelector from '../components/ThemeSelector'
+import DomainSettings from '../components/DomainSettings'
 import { PortfolioManifest } from '../types/manifest'
 
 const MinimalTheme = lazy(() => import('../themes/MinimalTheme'))
@@ -26,9 +27,10 @@ const themes = {
 }
 
 export default function Dashboard() {
-  const { currentUser, logout, updateManifest, updateTheme, toggleRandomTheme } = useUser()
+  const { currentUser, logout, updateManifest, updateTheme, toggleRandomTheme, updateSubdomain } = useUser()
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [isThemeSelectorPanelOpen, setIsThemeSelectorPanelOpen] = useState(false)
+  const [isDomainPanelOpen, setIsDomainPanelOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [dialog, setDialog] = useState<{ isOpen: boolean; title: string; message: string; type: 'error' | 'success' | 'info' }>({
     isOpen: false,
@@ -47,7 +49,9 @@ export default function Dashboard() {
 
   const currentTheme = (currentUser.theme || 'minimal') as ThemeName
   const CurrentThemeComponent = themes[currentTheme]
-  const portfolioUrl = `${window.location.origin}/${currentUser.username}`
+  const portfolioUrl = currentUser.subdomain
+    ? `https://${currentUser.subdomain}.withlumeo.com`
+    : `${window.location.origin}/${currentUser.username}`
 
   const handleSaveManifest = async (manifest: PortfolioManifest) => {
     try {
@@ -115,6 +119,7 @@ export default function Dashboard() {
               onClick={() => {
                 setIsEditorOpen(false)
                 setIsThemeSelectorPanelOpen(false)
+                setIsDomainPanelOpen(false)
               }}
               className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
               style={{ imageRendering: 'pixelated' }}
@@ -126,6 +131,7 @@ export default function Dashboard() {
               onClick={() => {
                 setIsEditorOpen(true)
                 setIsThemeSelectorPanelOpen(false)
+                setIsDomainPanelOpen(false)
               }}
               className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
               style={{ imageRendering: 'pixelated' }}
@@ -137,11 +143,24 @@ export default function Dashboard() {
               onClick={() => {
                 setIsThemeSelectorPanelOpen(true)
                 setIsEditorOpen(false)
+                setIsDomainPanelOpen(false)
               }}
               className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
               style={{ imageRendering: 'pixelated' }}
             >
               Themes
+            </button>
+
+            <button
+              onClick={() => {
+                setIsDomainPanelOpen(true)
+                setIsEditorOpen(false)
+                setIsThemeSelectorPanelOpen(false)
+              }}
+              className="w-full px-6 py-3 bg-neutral-700 text-neutral-300 border-4 border-neutral-400 hover:bg-neutral-600 hover:shadow-md transition-all font-mono tracking-wider uppercase shadow-sm"
+              style={{ imageRendering: 'pixelated' }}
+            >
+              Domain
             </button>
 
             <button
@@ -165,7 +184,7 @@ export default function Dashboard() {
       <div className="fixed left-[280px] right-0 top-0 bottom-0 p-4 flex flex-col min-h-0">
         {/* Preview Window */}
         <div className={`border-4 border-neutral-600 flex flex-col transition-all duration-500 ease-in-out shadow-lg ${
-          (isEditorOpen || isThemeSelectorPanelOpen) ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 flex-1'
+          (isEditorOpen || isThemeSelectorPanelOpen || isDomainPanelOpen) ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 flex-1'
         } min-h-0`} style={{ imageRendering: 'pixelated' }}>
           {/* Preview Label */}
           <div className="bg-neutral-800 border-b-4 border-neutral-600 px-4 py-2 flex items-center justify-between flex-shrink-0">
@@ -280,6 +299,49 @@ export default function Dashboard() {
                 setIsThemeSelectorPanelOpen(false)
               }}
               onClose={() => setIsThemeSelectorPanelOpen(false)}
+            />
+          </div>
+        </div>
+
+        {/* Domain Settings Window*/}
+        <div className={`border-4 border-neutral-600 flex flex-col transition-all duration-500 ease-in-out shadow-lg ${
+          isDomainPanelOpen ? 'flex-1 opacity-100' : 'h-0 opacity-0 overflow-hidden'
+        } min-h-0`} style={{ imageRendering: 'pixelated' }}>
+          {/* Domain Settings Header */}
+          <div className="bg-neutral-800 border-b-4 border-neutral-600 px-4 py-2 flex items-center justify-between flex-shrink-0">
+            <div>
+              <p className="text-neutral-300 font-mono text-sm uppercase">&gt; Domain Settings</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsDomainPanelOpen(false)}
+                className="text-white bg-neutral-700 hover:bg-neutral-600 text-xl font-bold w-8 h-8 flex items-center justify-center border-3 border-neutral-500 hover:shadow-md transition shadow-sm"
+                style={{ imageRendering: 'pixelated', borderWidth: '3px' }}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          {/* Domain Settings Content */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 min-h-0 bg-neutral-900">
+            <DomainSettings
+              currentSubdomain={currentUser.subdomain}
+              onSave={async (subdomain) => {
+                try {
+                  await updateSubdomain(subdomain)
+                } catch (error) {
+                  setDialog({
+                    isOpen: true,
+                    title: 'SUBDOMAIN UPDATE FAILED',
+                    message: error instanceof Error ? error.message : 'Failed to update subdomain. Please try again.',
+                    type: 'error'
+                  })
+                  throw error
+                }
+              }}
+              onClose={() => setIsDomainPanelOpen(false)}
             />
           </div>
         </div>

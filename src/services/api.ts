@@ -47,6 +47,7 @@ export interface PortfolioResponse {
   random_theme: boolean
   manifest: PortfolioManifest
   is_public: boolean
+  subdomain?: string | null
   created_at: string
   updated_at: string
 }
@@ -140,8 +141,29 @@ export const api = {
     return response.json()
   },
 
-  async getPublicPortfolio(username: string): Promise<PublicPortfolioResponse> {
-    const response = await fetch(`${API_URL}/api/portfolio/public/${username}`)
+  async updateSubdomain(subdomain: string | null): Promise<PortfolioResponse> {
+    const token = getToken()
+    if (!token) throw new Error('Not authenticated')
+
+    const response = await fetch(`${API_URL}/api/portfolio/me/subdomain`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ subdomain })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update subdomain')
+    }
+
+    return response.json()
+  },
+
+  async getPublicPortfolioBySubdomain(subdomain: string): Promise<PublicPortfolioResponse> {
+    const response = await fetch(`${API_URL}/api/portfolio/public/subdomain?subdomain=${encodeURIComponent(subdomain)}`)
 
     if (!response.ok) {
       const error = await response.json()

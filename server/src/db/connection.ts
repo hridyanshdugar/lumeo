@@ -30,6 +30,23 @@ const schema = fs.readFileSync(schemaPath, 'utf-8')
 
 db.exec(schema)
 
+// Migration: Add subdomain column if it doesn't exist
+try {
+  const tableInfo = db.prepare("PRAGMA table_info(portfolios)").all() as Array<{ name: string }>
+  const hasSubdomain = tableInfo.some(col => col.name === 'subdomain')
+  
+  if (!hasSubdomain) {
+    console.log('Migrating: Adding subdomain column to portfolios table')
+    db.exec(`
+      ALTER TABLE portfolios ADD COLUMN subdomain TEXT UNIQUE;
+      CREATE INDEX IF NOT EXISTS idx_portfolios_subdomain ON portfolios(subdomain);
+    `)
+    console.log('Migration completed: subdomain column added')
+  }
+} catch (error) {
+  console.error('Migration error:', error)
+}
+
 console.log(`SQLite database initialized at: ${DB_PATH}`)
 
 export default db
