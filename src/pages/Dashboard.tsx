@@ -328,6 +328,7 @@ export default function Dashboard() {
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 min-h-0 bg-neutral-900">
             <DomainSettings
               currentSubdomain={currentUser.subdomain}
+              username={currentUser.username}
               onSave={async (subdomain) => {
                 try {
                   await updateSubdomain(subdomain)

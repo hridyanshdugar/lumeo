@@ -10,6 +10,7 @@ const DOMAIN = 'withlumeo.com'
 
 interface DomainSettingsProps {
   currentSubdomain: string | null | undefined
+  username: string
   onSave: (subdomain: string | null) => Promise<void>
   onClose: () => void
 }
@@ -44,7 +45,9 @@ function validateSubdomain(subdomain: string): { valid: boolean; error?: string 
   return { valid: true }
 }
 
-export default function DomainSettings({ currentSubdomain, onSave, onClose }: DomainSettingsProps) {
+export default function DomainSettings({ currentSubdomain, username, onSave, onClose }: DomainSettingsProps) {
+  // Default to username if subdomain is not set
+  const defaultSubdomain = currentSubdomain || username.toLowerCase()
   const [subdomain, setSubdomain] = useState(currentSubdomain || '')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -105,13 +108,12 @@ export default function DomainSettings({ currentSubdomain, onSave, onClose }: Do
         <div className="bg-neutral-800 p-4 border-4 border-neutral-600">
           <p className="text-neutral-400 text-sm font-mono uppercase mb-2">&gt; Current Subdomain</p>
           <p className="text-neutral-300 font-mono text-lg">
-            {currentSubdomain || 'Not set'}
+            {currentSubdomain || username.toLowerCase()}
+            {!currentSubdomain && <span className="text-neutral-500 text-sm ml-2">(default: username)</span>}
           </p>
-          {currentSubdomain && (
-            <p className="text-neutral-400 font-mono text-sm mt-2">
-              {`https://${currentSubdomain}.${DOMAIN}`}
-            </p>
-          )}
+          <p className="text-neutral-400 font-mono text-sm mt-2">
+            {`https://${currentSubdomain || username.toLowerCase()}.${DOMAIN}`}
+          </p>
         </div>
 
         {/* Input Field */}
@@ -161,7 +163,8 @@ export default function DomainSettings({ currentSubdomain, onSave, onClose }: Do
             <li>3-63 characters</li>
             <li>Lowercase letters, numbers, and hyphens only</li>
             <li>Cannot start or end with hyphen</li>
-            <li>Leave empty to remove subdomain</li>
+            <li>Default subdomain is your username: <span className="text-neutral-300">{username.toLowerCase()}</span></li>
+            <li>Leave empty to use default (username)</li>
           </ul>
         </div>
 
