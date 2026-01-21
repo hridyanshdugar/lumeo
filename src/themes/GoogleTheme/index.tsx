@@ -24,7 +24,7 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
     const saved = localStorage.getItem('googleThemeDarkMode');
     return saved ? JSON.parse(saved) : false;
   });
-  const fullSearchText = `${manifest.personalInfo.name} portfolio`;
+  const fullSearchText = `${manifest.personalInfo.name}'s portfolio`;
 
   // Persist dark mode to localStorage
   useEffect(() => {
