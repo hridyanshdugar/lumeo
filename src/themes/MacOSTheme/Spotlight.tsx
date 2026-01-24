@@ -20,21 +20,19 @@ export const Spotlight = ({ manifest, apps, onClose, onOpenApp }: SpotlightProps
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const projectIcon = (
-    <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center shadow">
-      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-    </div>
-  )
-  const skillIcon = (
-    <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-gray-400 to-gray-600 flex items-center justify-center shadow">
-      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    </div>
-  )
+  // const projectIcon = (
+  //   <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center shadow">
+  //     <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+  //   </div>
+  // )
+  // const skillIcon = (
+  //   <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-gray-400 to-gray-600 flex items-center justify-center shadow">
+  //     <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+  //   </div>
+  // )
 
   const allItems = [
     ...apps.map(app => ({ type: 'app', ...app })),
-    ...manifest.projects.map(p => ({ type: 'project', id: p.name, title: p.name, icon: projectIcon })),
-    ...manifest.skills.flatMap(g => g.items.map(s => ({ type: 'skill', id: s, title: s, icon: skillIcon, description: g.category }))),
   ]
 
   const filtered = query 
