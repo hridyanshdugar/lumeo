@@ -239,7 +239,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
                     {exp.startDate} - {exp.endDate || 'Present'}
                   </div>
                 </div>
-                <div className="text-gray-400 text-sm">{exp.description}</div>
+                <div className="text-gray-400 text-sm break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{exp.description}</div>
                 {exp.achievements && exp.achievements.length > 0 && (
                   <div className="space-y-1">
                     {exp.achievements.map((achievement, i) => (
@@ -272,7 +272,7 @@ export default function TerminalTheme({ manifest }: ThemeProps) {
             {projects.map((project, idx) => (
               <div key={idx} className="pl-4 space-y-2 border-l-2 border-gray-700">
                 <div className="text-white font-semibold">{project.name}</div>
-                <div className="text-gray-400 text-sm">{project.description}</div>
+                <div className="text-gray-400 text-sm break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{project.description}</div>
                 {project.highlights && project.highlights.length > 0 && (
                   <div className="space-y-1">
                     {project.highlights.map((highlight, i) => (

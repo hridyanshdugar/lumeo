@@ -1,8 +1,6 @@
 import { motion, animate, MotionValue, useMotionValue, useMotionValueEvent } from 'framer-motion'
 import { PortfolioManifest, Project } from '../types/manifest'
 import { useState, useEffect, useRef } from 'react'
-import Icon from '@mdi/react'
-import { mdiWeatherSunny, mdiWeatherNight } from '@mdi/js'
 
 interface ThemeProps {
   manifest: PortfolioManifest
@@ -186,9 +184,9 @@ function ProjectsScroller({ projects, isDark, wrapperRef }: ProjectsScrollerWith
               } border`}
             >
               <h3 className="text-xl font-bold mb-3">{project.name}</h3>
-              <p className={`mb-3 text-sm leading-relaxed ${
+              <p className={`mb-3 text-sm leading-relaxed break-words ${
                 isDark ? 'text-zinc-400' : 'text-neutral-600'
-              }`}>
+              }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                 {project.description}
               </p>
 
@@ -295,9 +293,9 @@ function ProjectsScroller({ projects, isDark, wrapperRef }: ProjectsScrollerWith
             } border`}
           >
             <h3 className="text-2xl font-bold mb-4">{project.name}</h3>
-            <p className={`mb-4 text-sm leading-relaxed ${
+            <p className={`mb-4 text-sm leading-relaxed break-words ${
               isDark ? 'text-zinc-400' : 'text-neutral-600'
-            }`}>
+            }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
               {project.description}
             </p>
 
@@ -367,14 +365,22 @@ function ProjectsScroller({ projects, isDark, wrapperRef }: ProjectsScrollerWith
   )
 }
 
-export default function SereneTheme({ manifest }: ThemeProps) {
+export default function AppleTheme({ manifest }: ThemeProps) {
   const { personalInfo, experience, projects, education, skills } = manifest
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
+    // Load SF Pro font
+    const link = document.createElement('link')
+    link.href = 'https://fonts.cdnfonts.com/css/sf-pro-display'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+    
     // Check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     setIsDark(prefersDark)
+    
+    return () => { document.head.removeChild(link) }
   }, [])
 
   const toggleTheme = () => setIsDark(!isDark)
@@ -396,9 +402,12 @@ export default function SereneTheme({ manifest }: ThemeProps) {
   }
 
   return (
-    <div className={`relative min-h-screen transition-colors duration-500 ${
-      isDark ? 'bg-zinc-950 text-zinc-100' : 'bg-neutral-50 text-neutral-900'
-    }`}>
+    <div 
+      className={`relative min-h-screen transition-colors duration-500 ${
+        isDark ? 'bg-black text-white' : 'bg-[#fbfbfd] text-[#1d1d1f]'
+      }`}
+      style={{ fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}
+    >
       {/* Floating Navbar */}
       <div className="sticky top-4 left-0 right-0 z-50 flex justify-center px-4 py-4">
         <motion.nav
@@ -420,11 +429,15 @@ export default function SereneTheme({ manifest }: ThemeProps) {
               }`}
               aria-label="Toggle theme"
             >
-              <Icon
-                path={isDark ? mdiWeatherSunny : mdiWeatherNight}
-                size={0.8}
-                className={isDark ? 'text-yellow-400' : 'text-slate-700'}
-              />
+              {isDark ? (
+                <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
             </button>
           </div>
         </motion.nav>
@@ -610,9 +623,9 @@ export default function SereneTheme({ manifest }: ThemeProps) {
                     style={{ transition: 'transform 0.15s ease-out, background-color 0.15s, box-shadow 0.15s' }}
                   >
                     <h4 className="text-base font-semibold mb-1">{project.name}</h4>
-                    <p className={`text-xs mb-2 line-clamp-1 ${
+                    <p className={`text-xs mb-2 line-clamp-1 break-words ${
                       isDark ? 'text-zinc-400' : 'text-neutral-600'
-                    }`}>
+                    }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       {project.description}
                     </p>
                     <div className="flex flex-wrap gap-1.5">
@@ -676,9 +689,9 @@ export default function SereneTheme({ manifest }: ThemeProps) {
                         {exp.startDate}
                       </span>
                     </div>
-                    <p className={`text-xs line-clamp-1 ${
+                    <p className={`text-xs line-clamp-1 break-words ${
                       isDark ? 'text-zinc-500' : 'text-neutral-600'
-                    }`}>
+                    }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       {exp.description}
                     </p>
                   </motion.a>
@@ -774,7 +787,7 @@ export default function SereneTheme({ manifest }: ThemeProps) {
                           {exp.startDate} - {exp.endDate || 'Present'}
                         </span>
                       </div>
-                      <p className={`text-sm mb-4 ${isDark ? 'text-zinc-500' : 'text-neutral-600'}`}>
+                      <p className={`text-sm mb-4 break-words ${isDark ? 'text-zinc-500' : 'text-neutral-600'}`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {exp.description}
                       </p>
                       {exp.technologies && (

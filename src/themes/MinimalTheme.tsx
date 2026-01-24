@@ -345,7 +345,7 @@ export default function MinimalTheme({ manifest }: ThemeProps) {
                           {exp.startDate} — {exp.endDate || 'Present'}
                         </span>
                       </div>
-                      <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed mb-4">
+                      <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {exp.description && exp.description.length > 120 && !isExpanded
                           ? exp.description.substring(0, 120) + '...'
                           : exp.description}
@@ -404,7 +404,7 @@ export default function MinimalTheme({ manifest }: ThemeProps) {
                       style={{ animationDelay: `${idx * 0.1}s` }}
                     >
                       <h3 className="text-xl font-semibold mb-3 text-neutral-900 dark:text-neutral-100">{project.name}</h3>
-                      <p className="text-neutral-700 dark:text-neutral-300 mb-4 text-sm leading-relaxed">
+                      <p className="text-neutral-700 dark:text-neutral-300 mb-4 text-sm leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {project.description && project.description.length > 100 && !isExpanded
                           ? project.description.substring(0, 100) + '...'
                           : project.description}

@@ -238,10 +238,15 @@ export default function CyberTheme({ manifest }: ThemeProps) {
                       ))}
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-6 text-cyan-400/70 mb-6 text-sm">
+                    <div className="flex flex-wrap justify-center gap-4 text-cyan-400/70 mb-6 text-sm">
                       <a href={`mailto:${personalInfo.email}`} className="hover:text-cyan-300 transition flex items-center gap-2">
                         <span>▸</span> {personalInfo.email}
                       </a>
+                      {personalInfo.phone && (
+                        <span className="flex items-center gap-2">
+                          <span>◆</span> {personalInfo.phone}
+                        </span>
+                      )}
                       {personalInfo.location && (
                         <span className="flex items-center gap-2">
                           <span>●</span> {personalInfo.location}
@@ -292,7 +297,7 @@ export default function CyberTheme({ manifest }: ThemeProps) {
                           {exp.startDate} — {exp.endDate || 'ACTIVE'}
                         </span>
                       </div>
-                      <p className="text-cyan-400/80 mb-4 leading-relaxed">
+                      <p className="text-cyan-400/80 mb-4 leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {exp.description && exp.description.length > 120 && !isExpanded
                           ? exp.description.substring(0, 120) + '...'
                           : exp.description}
@@ -360,7 +365,7 @@ export default function CyberTheme({ manifest }: ThemeProps) {
                         </div>
                       )}
                       <h3 className="text-2xl font-bold text-cyan-300 mb-3">&gt; {project.name}</h3>
-                      <p className="text-cyan-400/80 mb-4">
+                      <p className="text-cyan-400/80 mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {project.description && project.description.length > 100 && !isExpanded
                           ? project.description.substring(0, 100) + '...'
                           : project.description}

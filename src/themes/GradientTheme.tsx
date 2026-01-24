@@ -184,10 +184,11 @@ export default function GradientTheme({ manifest }: ThemeProps) {
                       ))}
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-6 text-white/90 mb-6">
+                    <div className="flex flex-wrap justify-center gap-4 text-white/90 mb-6">
                       <a href={`mailto:${personalInfo.email}`} className="hover:text-white transition">
                         {personalInfo.email}
                       </a>
+                      {personalInfo.phone && <span>{personalInfo.phone}</span>}
                       {personalInfo.location && <span>{personalInfo.location}</span>}
                     </div>
 
@@ -239,7 +240,7 @@ export default function GradientTheme({ manifest }: ThemeProps) {
                           {exp.startDate} - {exp.endDate || 'Present'}
                         </span>
                       </div>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4">
+                      <p className="text-gray-700 dark:text-gray-300 mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {exp.description && exp.description.length > 120 && !isExpanded
                           ? exp.description.substring(0, 120) + '...'
                           : exp.description}
@@ -309,7 +310,7 @@ export default function GradientTheme({ manifest }: ThemeProps) {
                       <h3 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent mb-3">
                         {project.name}
                       </h3>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4">
+                      <p className="text-gray-700 dark:text-gray-300 mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {project.description && project.description.length > 100 && !isExpanded
                           ? project.description.substring(0, 100) + '...'
                           : project.description}

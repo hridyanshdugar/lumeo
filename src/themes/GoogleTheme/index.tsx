@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PortfolioManifest } from '../../types/manifest';
-import { SnakeGame } from './SnakeGame';
-import { DarkModeToggle } from './DarkModeToggle';
-import { SearchHomepage } from './SearchHomepage';
-import { SearchHeader } from './SearchHeader';
-import { KnowledgePanel } from './KnowledgePanel';
-import { Pagination } from './Pagination';
-import { calculateItemsPerPage, getCurrentItems } from './utils';
+import { SnakeGame } from './SnakeGame.tsx';
+import { DarkModeToggle } from './DarkModeToggle.tsx';
+import { SearchHomepage } from './SearchHomepage.tsx';
+import { SearchHeader } from './SearchHeader.tsx';
+import { KnowledgePanel } from './KnowledgePanel.tsx';
+import { Pagination } from './Pagination.tsx';
+import { calculateItemsPerPage, getCurrentItems } from './utils.ts';
 
 interface GoogleThemeProps {
   manifest: PortfolioManifest;
@@ -174,9 +174,9 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
                               }`}>
                                 {project.name}
                               </h3>
-                              <p className={`text-sm leading-relaxed max-w-2xl mb-3 line-clamp-3 ${
+                              <p className={`text-sm leading-relaxed max-w-2xl mb-3 line-clamp-3 break-words ${
                                 darkMode ? 'text-gray-300' : 'text-gray-700'
-                              }`}>
+                              }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                                 {project.description}
                               </p>
                               {project.technologies && project.technologies.length > 0 && (
@@ -239,9 +239,9 @@ export const GoogleTheme: React.FC<GoogleThemeProps> = ({ manifest }) => {
                               <div className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 {exp.startDate} - {exp.endDate || 'Present'}
                               </div>
-                              <p className={`text-sm leading-relaxed max-w-2xl mb-2 line-clamp-3 ${
+                              <p className={`text-sm leading-relaxed max-w-2xl mb-2 line-clamp-3 break-words ${
                                 darkMode ? 'text-gray-300' : 'text-gray-700'
-                              }`}>
+                              }`} style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                                 {exp.description}
                               </p>
                               {exp.technologies && exp.technologies.length > 0 && (

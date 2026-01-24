@@ -7,7 +7,7 @@ interface SnakeGameProps {
 export const SnakeGame: React.FC<SnakeGameProps> = ({ darkMode = false }) => {
   const [snake, setSnake] = useState([[5, 5]]);
   const [food, setFood] = useState([10, 10]);
-  const [direction, setDirection] = useState({ current: [0, 0], next: [0, 0] });
+  const [, setDirection] = useState({ current: [0, 0], next: [0, 0] });
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [score, setScore] = useState(0);
