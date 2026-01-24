@@ -180,3 +180,56 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Failed to login' })
   }
 }
+
+export const deleteUserByUsername = async (req: Request, res: Response): Promise<void> => {
+  const apiKey = req.headers['x-api-key']
+  const expectedApiKey = process.env.DELETE_USER_APIKEY
+
+  if (!expectedApiKey) {
+    res.status(500).json({ error: 'API key not configured on server' })
+    return
+  }
+
+  if (!apiKey || apiKey !== expectedApiKey) {
+    res.status(401).json({ error: 'Invalid or missing API key' })
+    return
+  }
+
+  const { username } = req.body
+
+  if (!username) {
+    res.status(400).json({ error: 'Username is required' })
+    return
+  }
+
+  try {
+    // Find the user
+    const user = db.prepare('SELECT id, username, email FROM users WHERE username = ?').get(username)
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' })
+      return
+    }
+
+    // Delete the user (portfolio will be deleted automatically via CASCADE)
+    const deleteStmt = db.prepare('DELETE FROM users WHERE username = ?')
+    const result = deleteStmt.run(username)
+
+    if (result.changes === 0) {
+      res.status(500).json({ error: 'Failed to delete user' })
+      return
+    }
+
+    res.json({
+      message: 'User and portfolio deleted successfully',
+      deletedUser: {
+        id: (user as any).id,
+        username: (user as any).username,
+        email: (user as any).email
+      }
+    })
+  } catch (error) {
+    console.error('Delete user error:', error)
+    res.status(500).json({ error: 'Failed to delete user' })
+  }
+}
