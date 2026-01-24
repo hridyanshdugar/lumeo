@@ -8,8 +8,16 @@ const ModernTheme = lazy(() => import('../themes/ModernTheme'))
 const GradientTheme = lazy(() => import('../themes/GradientTheme'))
 const CyberTheme = lazy(() => import('../themes/CyberTheme'))
 const TerminalTheme = lazy(() => import('../themes/TerminalTheme'))
-const SereneTheme = lazy(() => import('../themes/SereneTheme'))
 const GoogleTheme = lazy(() => import('../themes/GoogleTheme/index').then(module => ({ default: module.GoogleTheme })))
+const SpotifyTheme = lazy(() => import('../themes/SpotifyTheme/index').then(module => ({ default: module.SpotifyTheme })))
+const NotionTheme = lazy(() => import('../themes/NotionTheme/index').then(module => ({ default: module.NotionTheme })))
+const VSCodeTheme = lazy(() => import('../themes/VSCodeTheme/index').then(module => ({ default: module.VSCodeTheme })))
+const AppleTheme = lazy(() => import('../themes/AppleTheme'))
+const TwitterTheme = lazy(() => import('../themes/TwitterTheme/index').then(module => ({ default: module.TwitterTheme })))
+const NetflixTheme = lazy(() => import('../themes/NetflixTheme/index').then(module => ({ default: module.NetflixTheme })))
+const WindowsTheme = lazy(() => import('../themes/WindowsTheme/index').then(module => ({ default: module.WindowsTheme })))
+const MacOSTheme = lazy(() => import('../themes/MacOSTheme/index').then(module => ({ default: module.MacOSTheme })))
+const NewspaperTheme = lazy(() => import('../themes/NewspaperTheme/index').then(module => ({ default: module.NewspaperTheme })))
 
 const themes = {
   minimal: MinimalTheme,
@@ -17,8 +25,16 @@ const themes = {
   gradient: GradientTheme,
   cyber: CyberTheme,
   terminal: TerminalTheme,
-  serene: SereneTheme,
   google: GoogleTheme,
+  spotify: SpotifyTheme,
+  notion: NotionTheme,
+  vscode: VSCodeTheme,
+  apple: AppleTheme,
+  twitter: TwitterTheme,
+  netflix: NetflixTheme,
+  windows: WindowsTheme,
+  macos: MacOSTheme,
+  newspaper: NewspaperTheme,
 }
 
 export default function PublicPortfolio() {

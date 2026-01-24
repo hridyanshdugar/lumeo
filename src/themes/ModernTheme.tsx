@@ -177,10 +177,11 @@ export default function ModernTheme({ manifest }: ThemeProps) {
                       ))}
                     </div>
 
-                    <div className="flex gap-6 text-blue-100">
+                    <div className="flex flex-wrap gap-4 text-blue-100">
                       <a href={`mailto:${personalInfo.email}`} className="hover:text-white transition">
                         {personalInfo.email}
                       </a>
+                      {personalInfo.phone && <span>{personalInfo.phone}</span>}
                       {personalInfo.location && <span>{personalInfo.location}</span>}
                     </div>
 
@@ -228,7 +229,7 @@ export default function ModernTheme({ manifest }: ThemeProps) {
                           {exp.startDate} - {exp.endDate || 'Present'}
                         </span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 mb-4">
+                      <p className="text-slate-700 dark:text-slate-300 mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {exp.description && exp.description.length > 120 && !isExpanded
                           ? exp.description.substring(0, 120) + '...'
                           : exp.description}
@@ -294,7 +295,7 @@ export default function ModernTheme({ manifest }: ThemeProps) {
                         />
                       )}
                       <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{project.name}</h3>
-                      <p className="text-slate-700 dark:text-slate-300 mb-4">
+                      <p className="text-slate-700 dark:text-slate-300 mb-4 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {project.description && project.description.length > 100 && !isExpanded
                           ? project.description.substring(0, 100) + '...'
                           : project.description}
