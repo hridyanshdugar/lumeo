@@ -1,5 +1,5 @@
-# Allow all search engines to crawl all pages
-# When served by the Node server, robots.txt is generated dynamically with the correct Sitemap URL.
+# Only standard directives (User-agent, Allow, Disallow, Sitemap) are valid.
+# When served by the Node server, robots.txt is generated dynamically.
 User-agent: *
 Allow: /
 
