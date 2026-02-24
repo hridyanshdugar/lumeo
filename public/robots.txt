@@ -1,9 +1,6 @@
 # Allow all search engines to crawl all pages
+# When served by the Node server, robots.txt is generated dynamically with the correct Sitemap URL.
 User-agent: *
 Allow: /
 
-# Crawl-delay (optional, helps prevent overloading the server)
-Crawl-delay: 1
-
-# Dynamic sitemap (auto-updates with new portfolios)
-Sitemap: http://localhost:3001/sitemap.xml
+Sitemap: https://withlumeo.com/sitemap.xml

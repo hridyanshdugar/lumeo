@@ -141,6 +141,26 @@ export const getAllPublicPortfolios = async (req: Request, res: Response): Promi
   }
 }
 
+/** Returns public portfolio data by subdomain for SEO/server use, or null if not found. */
+export function getPublicPortfolioDataBySubdomain(subdomain: string): {
+  manifest: any
+  theme: string
+  random_theme: boolean
+} | null {
+  const result = db.prepare(
+    `SELECT p.theme, p.random_theme, p.manifest
+     FROM portfolios p
+     WHERE p.subdomain = ? AND p.is_public = 1`
+  ).get(subdomain) as { theme: string; random_theme: number; manifest: string } | undefined
+
+  if (!result) return null
+  return {
+    manifest: JSON.parse(result.manifest),
+    theme: result.theme,
+    random_theme: Boolean(result.random_theme)
+  }
+}
+
 export const getPortfolioBySubdomain = async (req: SubdomainRequest, res: Response): Promise<void> => {
   const subdomain = req.subdomain
 
@@ -150,22 +170,21 @@ export const getPortfolioBySubdomain = async (req: SubdomainRequest, res: Respon
   }
 
   try {
+    const data = getPublicPortfolioDataBySubdomain(subdomain)
+    if (!data) {
+      res.status(404).json({ error: 'Portfolio not found or not public' })
+      return
+    }
     const result = db.prepare(
-      `SELECT p.id, p.theme, p.random_theme, p.manifest, p.created_at, p.updated_at, u.username
+      `SELECT p.id, p.theme, p.random_theme, p.created_at, p.updated_at, u.username
        FROM portfolios p
        JOIN users u ON p.user_id = u.id
        WHERE p.subdomain = ? AND p.is_public = 1`
     ).get(subdomain)
-
-    if (!result) {
-      res.status(404).json({ error: 'Portfolio not found or not public' })
-      return
-    }
-
     res.json({
       ...(result as any),
-      manifest: JSON.parse((result as any).manifest),
-      random_theme: Boolean((result as any).random_theme)
+      manifest: data.manifest,
+      random_theme: data.random_theme
     })
   } catch (error) {
     console.error('Get portfolio by subdomain error:', error)

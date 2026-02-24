@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js'
 import portfolioRoutes from './routes/portfolio.js'
 import sitemapRoutes from './routes/sitemap.js'
 import { extractSubdomain } from './middleware/subdomain.js'
+import { profileSeoMiddleware } from './middleware/profileSeo.js'
 
 dotenv.config()
 
@@ -36,7 +37,9 @@ app.get('/health', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../../dist')
   app.use(express.static(frontendDistPath))
-  
+
+  app.use(profileSeoMiddleware(frontendDistPath))
+
   app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
       return next()

@@ -3,35 +3,42 @@ import db from '../db/connection.js'
 
 const router = Router()
 
+const ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'withlumeo.com'
+const BASE_URL = process.env.BASE_URL || `https://${ROOT_DOMAIN}`
+
+router.get('/robots.txt', (_req, res) => {
+  res.type('text/plain')
+  res.send(`User-agent: *
+Allow: /
+
+Sitemap: ${BASE_URL}/sitemap.xml
+`)
+})
+
 router.get('/sitemap.xml', (req, res) => {
   try {
-    const protocol = req.protocol
-    const host = req.get('host')
-    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`
-
     const portfolios = db
       .prepare(
-        `SELECT u.username, p.updated_at
+        `SELECT p.subdomain, p.updated_at
          FROM portfolios p
-         JOIN users u ON p.user_id = u.id
-         WHERE p.is_public = 1`
+         WHERE p.is_public = 1 AND p.subdomain IS NOT NULL AND p.subdomain != ''`
       )
-      .all() as Array<{ username: string; updated_at: string }>
+      .all() as Array<{ subdomain: string; updated_at: string }>
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>${BASE_URL}/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Public portfolios -->
+  <!-- Public portfolios (subdomain URLs) -->
 ${portfolios
   .map(
     (portfolio) => `  <url>
-    <loc>${baseUrl}/${portfolio.username}</loc>
+    <loc>https://${portfolio.subdomain}.${ROOT_DOMAIN}</loc>
     <lastmod>${new Date(portfolio.updated_at).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
