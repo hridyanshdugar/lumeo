@@ -38,22 +38,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
 })
 
-// Debug: see what host/subdomain the server receives (for Cloudflare/routing). Remove or guard in prod if desired.
-app.get('/_host-debug', (req, res) => {
-  const subReq = req as express.Request & { subdomain?: string }
-  res.json({
-    host: req.get('host') ?? null,
-    xForwardedHost: req.get('x-forwarded-host') ?? null,
-    subdomain: subReq.subdomain ?? null,
-    nodeEnv: process.env.NODE_ENV ?? null
-  })
-})
-
 if (process.env.NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../../dist')
-  app.use(express.static(frontendDistPath))
-
+  // Profile SEO must run before static so GET / on a subdomain gets injected HTML, not default index.html
   app.use(profileSeoMiddleware(frontendDistPath))
+  app.use(express.static(frontendDistPath))
 
   app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
