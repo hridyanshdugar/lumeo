@@ -92,7 +92,8 @@ function buildMetaTags(manifest: any, subdomain: string): string {
   const { personalInfo } = manifest
   const name = personalInfo?.name ?? 'Portfolio'
   const title = `${name} - Portfolio`
-  const description = (personalInfo?.bio || personalInfo?.title || '').slice(0, 160)
+  const rawDesc = (personalInfo?.bio || personalInfo?.title || '').trim()
+  const description = rawDesc ? rawDesc.slice(0, 160) : `About ${name}`
   const url = `https://${subdomain}.${ROOT_DOMAIN}`
   const image = personalInfo?.avatar || ''
 
@@ -205,6 +206,14 @@ export function profileSeoMiddleware(
       const title = `${name} - Portfolio`
 
       html = html.replace('<title>Lumeo</title>', `<title>${escapeHtml(title)}</title>`)
+      // Remove default Lumeo meta so profile description/title are the only ones
+      html = html.replace(/<meta name="description" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta property="og:title" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta property="og:description" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta property="og:type" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta name="twitter:card" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta name="twitter:title" content="[^"]*" \/>\s*/g, '')
+      html = html.replace(/<meta name="twitter:description" content="[^"]*" \/>\s*/g, '')
 
       const metaTags = buildMetaTags(manifest, subdomain)
       const jsonLd = buildFullProfileJsonLd(manifest, subdomain)
