@@ -229,6 +229,8 @@ export function profileSeoMiddleware(
 
       res.setHeader(SEO_HEADER, 'applied')
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      // Short CDN cache so each subdomain gets correct HTML; avoid serving one profile for another
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
       res.send(html)
     } catch (err) {
       console.error('Profile SEO middleware error:', err)
