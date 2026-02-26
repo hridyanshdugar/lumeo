@@ -20,8 +20,8 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;')
 }
 
-function buildPersonJsonLd(manifest: any, subdomain: string): object {
-  const { personalInfo } = manifest
+function buildFullProfileJsonLd(manifest: any, subdomain: string): object {
+  const { personalInfo, experience = [], projects = [], education = [], skills = [] } = manifest
   const url = `https://${subdomain}.${ROOT_DOMAIN}`
   const sameAs: string[] = []
   const links = personalInfo?.links
@@ -31,15 +31,61 @@ function buildPersonJsonLd(manifest: any, subdomain: string): object {
     if (links.linkedin) sameAs.push(links.linkedin)
     if (links.twitter) sameAs.push(links.twitter)
   }
-  return {
-    '@context': 'https://schema.org',
+
+  const person: Record<string, unknown> = {
     '@type': 'Person',
     name: personalInfo?.name ?? '',
     jobTitle: personalInfo?.title ?? '',
     image: personalInfo?.avatar || undefined,
-    url: url,
+    url,
     ...(sameAs.length > 0 ? { sameAs } : {})
   }
+
+  if (experience?.length > 0) {
+    person.worksFor = experience.map((exp: { company: string; position: string; startDate: string; endDate?: string }) => ({
+      '@type': 'Organization',
+      name: exp.company,
+      description: exp.position,
+      ...(exp.startDate && { startDate: exp.startDate }),
+      ...(exp.endDate && { endDate: exp.endDate })
+    }))
+  }
+  if (education?.length > 0) {
+    person.alumniOf = education.map((edu: { institution: string; degree: string; field: string }) => ({
+      '@type': 'CollegeOrUniversity',
+      name: edu.institution,
+      description: `${edu.degree} in ${edu.field}`
+    }))
+  }
+  const skillItems = skills?.flatMap((s: { items: string[] }) => s.items || []) || []
+  if (skillItems.length > 0) {
+    person.knowsAbout = [...new Set(skillItems)].slice(0, 50)
+  }
+
+  const graph: object[] = [
+    { '@context': 'https://schema.org', ...person }
+  ]
+
+  if (projects?.length > 0) {
+    graph.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Projects',
+      numberOfItems: projects.length,
+      itemListElement: projects.slice(0, 20).map((p: { name: string; description: string; links?: { demo?: string } }, i: number) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: p.name,
+          description: (p.description || '').slice(0, 500),
+          ...(p.links?.demo && { url: p.links.demo })
+        }
+      }))
+    })
+  }
+
+  return { '@context': 'https://schema.org', '@graph': graph }
 }
 
 function buildMetaTags(manifest: any, subdomain: string): string {
@@ -72,6 +118,65 @@ function buildMetaTags(manifest: any, subdomain: string): string {
   return parts.join('\n    ')
 }
 
+function truncate(str: string, max: number): string {
+  if (!str || typeof str !== 'string') return ''
+  return str.length <= max ? str : str.slice(0, max) + '…'
+}
+
+function buildNoscriptFullProfile(manifest: any): string {
+  const { personalInfo = {}, experience = [], projects = [], education = [], skills = [] } = manifest
+  const name = personalInfo?.name ?? 'Portfolio'
+  const jobTitle = personalInfo?.title ?? ''
+  const bio = truncate(personalInfo?.bio ?? '', 500)
+  const parts: string[] = [
+    '<noscript>',
+    '<article class="profile-seo-content" style="max-width:720px;margin:0 auto;padding:1.5rem;font-family:system-ui,sans-serif;line-height:1.5;color:#1a1a1a;">',
+    `<header><h1 style="margin:0 0 0.25rem 0;font-size:1.75rem;">${escapeHtml(name)}</h1>`,
+    jobTitle ? `<p style="margin:0 0 1rem 0;font-size:1rem;color:#555;">${escapeHtml(jobTitle)}</p>` : '',
+    bio ? `<p style="margin:0 0 1.5rem 0;">${escapeHtml(bio)}</p></header>` : '</header>'
+  ]
+
+  if (experience?.length > 0) {
+    parts.push('<section style="margin-bottom:1.5rem;"><h2 style="margin:0 0 0.5rem 0;font-size:1.25rem;">Experience</h2><ul style="margin:0;padding-left:1.25rem;">')
+    for (const exp of experience.slice(0, 10)) {
+      const range = exp.endDate ? `${exp.startDate} – ${exp.endDate}` : exp.startDate
+      const line = `${escapeHtml(exp.position)} at ${escapeHtml(exp.company)} (${escapeHtml(range)}). ${truncate(exp.description, 200)}`
+      parts.push(`<li style="margin-bottom:0.5rem;">${line}</li>`)
+    }
+    parts.push('</ul></section>')
+  }
+
+  if (projects?.length > 0) {
+    parts.push('<section style="margin-bottom:1.5rem;"><h2 style="margin:0 0 0.5rem 0;font-size:1.25rem;">Projects</h2><ul style="margin:0;padding-left:1.25rem;">')
+    for (const p of projects.slice(0, 15)) {
+      const desc = truncate(p.description || '', 150)
+      parts.push(`<li style="margin-bottom:0.5rem;"><strong>${escapeHtml(p.name)}</strong> — ${escapeHtml(desc)}</li>`)
+    }
+    parts.push('</ul></section>')
+  }
+
+  if (skills?.length > 0) {
+    const flat = skills.flatMap((s: { category: string; items: string[] }) => (s.items || []).map((i: string) => (s.category ? `${i} (${s.category})` : i)))
+    const unique = [...new Set(flat)].slice(0, 30)
+    if (unique.length > 0) {
+      parts.push('<section style="margin-bottom:1.5rem;"><h2 style="margin:0 0 0.5rem 0;font-size:1.25rem;">Skills</h2>')
+      parts.push(`<p style="margin:0;">${escapeHtml(unique.join(', '))}</p></section>`)
+    }
+  }
+
+  if (education?.length > 0) {
+    parts.push('<section style="margin-bottom:1.5rem;"><h2 style="margin:0 0 0.5rem 0;font-size:1.25rem;">Education</h2><ul style="margin:0;padding-left:1.25rem;">')
+    for (const edu of education.slice(0, 5)) {
+      const line = `${escapeHtml(edu.degree)} in ${escapeHtml(edu.field)} — ${escapeHtml(edu.institution)}${edu.endDate ? ` (${edu.endDate})` : ''}`
+      parts.push(`<li style="margin-bottom:0.5rem;">${line}</li>`)
+    }
+    parts.push('</ul></section>')
+  }
+
+  parts.push('</article></noscript>')
+  return parts.filter(Boolean).join('\n')
+}
+
 /**
  * In production, for GET requests to / with a profile subdomain, serve index.html
  * with injected meta tags and JSON-LD so crawlers get full user info without JS.
@@ -102,11 +207,11 @@ export function profileSeoMiddleware(
       html = html.replace('<title>Lumeo</title>', `<title>${escapeHtml(title)}</title>`)
 
       const metaTags = buildMetaTags(manifest, subdomain)
-      const jsonLd = buildPersonJsonLd(manifest, subdomain)
+      const jsonLd = buildFullProfileJsonLd(manifest, subdomain)
       const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`
       html = html.replace('</head>', `    ${metaTags}\n    ${jsonLdScript}\n  </head>`)
 
-      const noscriptSnippet = `<noscript><p><strong>${escapeHtml(name)}</strong> — ${escapeHtml(manifest?.personalInfo?.title ?? '')}</p><p>${escapeHtml((manifest?.personalInfo?.bio ?? '').slice(0, 300))}</p></noscript>`
+      const noscriptSnippet = buildNoscriptFullProfile(manifest)
       html = html.replace('<div id="root"></div>', `${noscriptSnippet}\n    <div id="root"></div>`)
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
