@@ -7,11 +7,15 @@ export interface SubdomainRequest extends Request {
 }
 
 export const extractSubdomain = (req: SubdomainRequest, _res: Response, next: NextFunction): void => {
-  const host = req.get('host') || ''
+  // Prefer X-Forwarded-Host when behind a proxy (Railway, Cloudflare, etc.) so we see the original host
+  const rawHost = req.get('x-forwarded-host') || req.get('host') || ''
+  const host = rawHost.split(':')[0]
   const parts = host.split('.')
-  
-  // subdomain.domain.tld = 3+ parts
+
+  // subdomain.domain.tld = 3+ parts (e.g. john.withlumeo.com)
   if (parts.length >= 3) {
+    req.subdomain = parts[0]
+  } else if (parts.length === 2 && parts[1] === 'localhost') {
     req.subdomain = parts[0]
   }
   next()
