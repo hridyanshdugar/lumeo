@@ -19,6 +19,15 @@ echo "Fetching: $URL"
 echo "User-Agent: $UA"
 echo ""
 
+# Get response headers (for X-Profile-SEO when request hits the Node server)
+HEADERS=$(curl -sS -I -A "$UA" "$URL" 2>/dev/null)
+SEO_HEADER=$(echo "$HEADERS" | grep -i '^X-Profile-SEO:' | sed 's/^X-Profile-SEO: //I' | tr -d '\r')
+if [[ -n "$SEO_HEADER" ]]; then
+  echo "--- Server (X-Profile-SEO) ---"
+  echo "  $SEO_HEADER"
+  echo ""
+fi
+
 BODY=$(curl -sS -A "$UA" "$URL" 2>/dev/null)
 
 check() {
@@ -30,7 +39,14 @@ check() {
 }
 
 echo "--- Checks ---"
-check '<title>' "Custom <title>"
+# Custom title = not the default "Lumeo"
+if echo "$BODY" | grep -q '<title>Lumeo</title>'; then
+  echo "  DEFAULT: Title is still 'Lumeo' (profile SEO not applied)"
+elif echo "$BODY" | grep -q '<title>'; then
+  echo "  OK: Custom <title> (profile SEO applied)"
+else
+  echo "  MISSING: <title>"
+fi
 check 'application/ld+json' "JSON-LD script"
 check '"@graph"' "JSON-LD @graph"
 check '"worksFor"' "JSON-LD worksFor (experience)"
@@ -45,6 +61,22 @@ check 'Skills</h2>' "Skills section"
 check 'Education</h2>' "Education section"
 check 'og:title' "Open Graph meta"
 check 'rel="canonical"' "Canonical URL"
+
+echo ""
+echo "--- Verdict ---"
+if echo "$BODY" | grep -q '"@graph"' && echo "$BODY" | grep -q 'profile-seo-content'; then
+  echo "Profile SEO is active: JSON-LD and noscript content present."
+else
+  echo "Profile SEO is NOT active. You are seeing the default Lumeo page."
+  if [[ -n "$SEO_HEADER" ]]; then
+    echo "Reason from server: $SEO_HEADER"
+  else
+    echo "No X-Profile-SEO header — request likely not reaching the Node server (e.g. static host/CDN)."
+    echo "Fix: point subdomain at the same app that runs the Node server and preserves Host header."
+  fi
+  echo ""
+  echo "If X-Profile-SEO was present: reason=no-subdomain → proxy not forwarding Host; reason=portfolio-not-found → DB has no row with subdomain='$SUBDOMAIN' and is_public=1."
+fi
 
 echo ""
 echo "--- Sample (first 120 chars of title and description) ---"

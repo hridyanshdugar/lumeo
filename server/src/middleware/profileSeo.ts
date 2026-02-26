@@ -177,24 +177,37 @@ function buildNoscriptFullProfile(manifest: any): string {
   return parts.filter(Boolean).join('\n')
 }
 
+const SEO_HEADER = 'X-Profile-SEO'
+
 /**
  * In production, for GET requests to / with a profile subdomain, serve index.html
  * with injected meta tags and JSON-LD so crawlers get full user info without JS.
+ * Sets X-Profile-SEO response header so you can verify on prod (applied | skip; reason=...).
  */
 export function profileSeoMiddleware(
   frontendDistPath: string
 ) {
   return function (req: SubdomainRequest, res: Response, next: NextFunction): void {
     if (req.method !== 'GET' || req.path !== '/') {
+      res.setHeader(SEO_HEADER, 'skip; reason=not-get-root')
       return next()
     }
     const subdomain = req.subdomain
-    if (!subdomain) return next()
+    if (!subdomain) {
+      res.setHeader(SEO_HEADER, 'skip; reason=no-subdomain')
+      return next()
+    }
     const validation = validateSubdomain(subdomain)
-    if (!validation.valid) return next()
+    if (!validation.valid) {
+      res.setHeader(SEO_HEADER, `skip; reason=invalid-subdomain`)
+      return next()
+    }
 
     const data = getPublicPortfolioDataBySubdomain(subdomain)
-    if (!data) return next()
+    if (!data) {
+      res.setHeader(SEO_HEADER, `skip; reason=portfolio-not-found; subdomain=${subdomain}`)
+      return next()
+    }
 
     try {
       const indexPath = path.join(frontendDistPath, 'index.html')
@@ -214,10 +227,12 @@ export function profileSeoMiddleware(
       const noscriptSnippet = buildNoscriptFullProfile(manifest)
       html = html.replace('<div id="root"></div>', `${noscriptSnippet}\n    <div id="root"></div>`)
 
+      res.setHeader(SEO_HEADER, 'applied')
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
       res.send(html)
     } catch (err) {
       console.error('Profile SEO middleware error:', err)
+      res.setHeader(SEO_HEADER, 'skip; reason=error')
       next()
     }
   }
