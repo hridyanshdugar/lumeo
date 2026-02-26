@@ -8,6 +8,7 @@ import portfolioRoutes from './routes/portfolio.js'
 import sitemapRoutes from './routes/sitemap.js'
 import { extractSubdomain } from './middleware/subdomain.js'
 import { profileSeoMiddleware } from './middleware/profileSeo.js'
+import { canonicalRedirect } from './middleware/canonicalRedirect.js'
 
 dotenv.config()
 
@@ -19,6 +20,9 @@ const __dirname = path.dirname(__filename)
 
 // Trust proxy for accurate host header (needed for Railway/deployment)
 app.set('trust proxy', true)
+
+// Canonical URL redirects (http→https, www→apex) so sitemap URL is the one Google indexes
+app.use(canonicalRedirect)
 
 app.use(cors())
 app.use(express.json())

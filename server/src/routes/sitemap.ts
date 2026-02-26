@@ -3,8 +3,9 @@ import db from '../db/connection.js'
 
 const router = Router()
 
-const ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'withlumeo.com'
-const BASE_URL = process.env.BASE_URL || `https://${ROOT_DOMAIN}`
+// Canonical root (no www) so sitemap URLs match the URL we redirect to
+const ROOT_DOMAIN = (process.env.ROOT_DOMAIN || 'withlumeo.com').replace(/^www\./i, '')
+const BASE_URL = `https://${ROOT_DOMAIN}`
 
 router.get('/robots.txt', (_req, res) => {
   res.type('text/plain')
