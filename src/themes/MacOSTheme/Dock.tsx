@@ -18,37 +18,26 @@ interface DockProps {
   openWindows: WindowState[]
   onAppClick: (app: App) => void
   onWindowClick: (id: string) => void
+  isMobile: boolean
 }
 
 const ICON_SPACING = 6
 const MAX_SCALE = 1.5
+const MOBILE_MAX_SCALE = 1.25
 
 const DockIcon = ({ 
-  app, 
-  isOpen, 
-  isBouncing, 
-  isHovered,
-  showTooltip,
-  onMouseEnter,
-  onMouseLeave,
-  onClick 
+  app, isOpen, isBouncing, isHovered, showTooltip,
+  onMouseEnter, onMouseLeave, onClick, isMobile
 }: { 
-  app: App
-  isOpen: boolean
-  isBouncing: boolean
-  isHovered: boolean
-  showTooltip: boolean
-  onMouseEnter: () => void
-  onMouseLeave: () => void
-  onClick: () => void
+  app: App; isOpen: boolean; isBouncing: boolean; isHovered: boolean
+  showTooltip: boolean; onMouseEnter: () => void; onMouseLeave: () => void
+  onClick: () => void; isMobile: boolean
 }) => {
-  const scale = useSpring(isHovered ? MAX_SCALE : 1, {
-    mass: 0.1,
-    stiffness: 300,
-    damping: 20
+  const maxScale = isMobile ? MOBILE_MAX_SCALE : MAX_SCALE
+  const scale = useSpring(isHovered ? maxScale : 1, {
+    mass: 0.1, stiffness: 300, damping: 20
   })
-
-  const translateX = useTransform(scale, [1, MAX_SCALE], [0, 12])
+  const translate = useTransform(scale, [1, maxScale], [0, isMobile ? -8 : 12])
 
   return (
     <motion.button
@@ -57,17 +46,20 @@ const DockIcon = ({
       onClick={onClick}
       style={{ 
         scale: isBouncing ? 1 : scale,
-        x: isBouncing ? 0 : translateX
+        ...(isMobile
+          ? { y: isBouncing ? 0 : translate }
+          : { x: isBouncing ? 0 : translate })
       }}
-      animate={isBouncing ? {
-        x: [0, 20, 0, 10, 0, 4, 0],
-      } : {}}
+      animate={isBouncing ? (isMobile
+        ? { y: [0, -20, 0, -10, 0, -4, 0] }
+        : { x: [0, 20, 0, 10, 0, 4, 0] }
+      ) : {}}
       transition={isBouncing ? { 
         duration: 0.6, 
         times: [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1],
         ease: 'easeOut'
       } : undefined}
-      className="relative flex items-center origin-left"
+      className={`relative flex items-center ${isMobile ? 'flex-col origin-bottom' : 'origin-left'}`}
     >
       <motion.div
         whileTap={{ scale: 0.9 }}
@@ -78,7 +70,10 @@ const DockIcon = ({
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            className="absolute -left-1.5 w-1 h-1 bg-white/90 rounded-full"
+            className={isMobile
+              ? "absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white/90 rounded-full"
+              : "absolute -left-1.5 top-1/2 -translate-y-1/2 w-1 h-1 bg-white/90 rounded-full"
+            }
             style={{ boxShadow: '0 0 4px rgba(255,255,255,0.5)' }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -105,7 +100,7 @@ const DockIcon = ({
   )
 }
 
-export const Dock = ({ apps, openWindows, onAppClick, onWindowClick }: DockProps) => {
+export const Dock = ({ apps, openWindows, onAppClick, onWindowClick, isMobile }: DockProps) => {
   const [bouncingApp, setBouncingApp] = useState<string | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -127,16 +122,22 @@ export const Dock = ({ apps, openWindows, onAppClick, onWindowClick }: DockProps
   }
 
   return (
-    <div className="fixed left-3 top-1/2 -translate-y-1/2 z-50" style={{ marginTop: '13px' }}>
+    <div
+      className={isMobile
+        ? "fixed bottom-2 left-1/2 -translate-x-1/2 z-50"
+        : "fixed left-3 top-1/2 -translate-y-1/2 z-50"
+      }
+      style={isMobile ? {} : { marginTop: '13px' }}
+    >
       <motion.div 
-        className="bg-white/20 backdrop-blur-2xl rounded-[20px] py-2 px-2 flex flex-col items-center border border-white/30"
+        className={`bg-white/20 backdrop-blur-2xl rounded-[20px] py-2 px-2 flex ${isMobile ? 'flex-row' : 'flex-col'} items-center border border-white/30`}
         style={{ 
           boxShadow: '0 0 0 0.5px rgba(255,255,255,0.2) inset, 0 25px 50px -12px rgba(0,0,0,0.4), 0 0 80px -20px rgba(0,0,0,0.3)',
-          gap: `${ICON_SPACING}px`
+          gap: `${isMobile ? 4 : ICON_SPACING}px`
         }}
         onMouseLeave={() => setHoveredIndex(null)}
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
+        initial={isMobile ? { y: 100, opacity: 0 } : { x: -100, opacity: 0 }}
+        animate={isMobile ? { y: 0, opacity: 1 } : { x: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 25, delay: 0.2 }}
       >
         {apps.map((app, index) => {
@@ -149,44 +150,40 @@ export const Dock = ({ apps, openWindows, onAppClick, onWindowClick }: DockProps
               isOpen={isOpen}
               isBouncing={isBouncing}
               isHovered={hoveredIndex === index}
-              showTooltip={hoveredIndex === index}
+              showTooltip={hoveredIndex === index && !isMobile}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => handleAppClick(app)}
+              isMobile={isMobile}
             />
           )
         })}
         
-        <div className="h-px w-10 bg-white/30 my-1 rounded-full" />
-        
-        <TrashIcon 
-          isHovered={hoveredIndex === apps.length}
-          showTooltip={hoveredIndex === apps.length}
-          onMouseEnter={() => setHoveredIndex(apps.length)}
-          onMouseLeave={() => setHoveredIndex(null)}
-        />
+        {!isMobile && (
+          <>
+            <div className="h-px w-10 bg-white/30 my-1 rounded-full" />
+            <TrashIcon 
+              isHovered={hoveredIndex === apps.length}
+              showTooltip={hoveredIndex === apps.length}
+              onMouseEnter={() => setHoveredIndex(apps.length)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            />
+          </>
+        )}
       </motion.div>
     </div>
   )
 }
 
 const TrashIcon = ({ 
-  isHovered,
-  showTooltip,
-  onMouseEnter,
-  onMouseLeave
+  isHovered, showTooltip, onMouseEnter, onMouseLeave
 }: { 
-  isHovered: boolean
-  showTooltip: boolean
-  onMouseEnter: () => void
-  onMouseLeave: () => void
+  isHovered: boolean; showTooltip: boolean
+  onMouseEnter: () => void; onMouseLeave: () => void
 }) => {
   const scale = useSpring(isHovered ? MAX_SCALE : 1, {
-    mass: 0.1,
-    stiffness: 300,
-    damping: 20
+    mass: 0.1, stiffness: 300, damping: 20
   })
-
   const translateX = useTransform(scale, [1, MAX_SCALE], [0, 12])
 
   return (

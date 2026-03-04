@@ -116,60 +116,56 @@ export const MenuBar = ({ activeApp, onSpotlightOpen }: MenuBarProps) => {
         {/* Active App Name */}
         <MenuItem bold>{activeApp}</MenuItem>
         
-        {/* Menu Items */}
-        <MenuItem>File</MenuItem>
-        <MenuItem>Edit</MenuItem>
-        <MenuItem>View</MenuItem>
-        <MenuItem>Go</MenuItem>
-        <MenuItem>Window</MenuItem>
-        <MenuItem>Help</MenuItem>
+        {/* Menu Items - hidden on mobile */}
+        <span className="hidden md:contents">
+          <MenuItem>File</MenuItem>
+          <MenuItem>Edit</MenuItem>
+          <MenuItem>View</MenuItem>
+          <MenuItem>Go</MenuItem>
+          <MenuItem>Window</MenuItem>
+          <MenuItem>Help</MenuItem>
+        </span>
       </div>
 
       <div className="flex items-center gap-1">
-        {/* Battery */}
-        <IconButton>
-          <svg className="w-[18px] h-[11px] opacity-90" viewBox="0 0 25 12" fill="none">
-            <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor" strokeOpacity="0.5"/>
-            <path d="M23 4v4a2 2 0 002-2v0a2 2 0 00-2-2z" fill="currentColor" fillOpacity="0.5"/>
-            <rect x="2" y="2" width="15" height="8" rx="1.5" fill="currentColor"/>
-          </svg>
-        </IconButton>
+        {/* Status icons - hidden on mobile */}
+        <span className="hidden md:contents">
+          <IconButton>
+            <svg className="w-[18px] h-[11px] opacity-90" viewBox="0 0 25 12" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor" strokeOpacity="0.5"/>
+              <path d="M23 4v4a2 2 0 002-2v0a2 2 0 00-2-2z" fill="currentColor" fillOpacity="0.5"/>
+              <rect x="2" y="2" width="15" height="8" rx="1.5" fill="currentColor"/>
+            </svg>
+          </IconButton>
+          <IconButton>
+            <svg className="w-[15px] h-[15px] opacity-90" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-4.9-2.3l1.4 1.4C9.4 16.5 10.6 16 12 16s2.6.5 3.5 1.1l1.4-1.4C15.6 14.6 13.9 14 12 14s-3.6.6-4.9 1.7zm-2.8-2.8l1.4 1.4C7.3 13 9.5 12 12 12s4.7 1 6.3 2.3l1.4-1.4C17.7 11.2 15 10 12 10s-5.7 1.2-7.7 2.9zm-2.8-2.8l1.4 1.4C5.3 10.2 8.5 9 12 9s6.7 1.2 9.1 2.5l1.4-1.4C19.8 8.5 16.1 7 12 7s-7.8 1.5-10.5 3.1z"/>
+            </svg>
+          </IconButton>
+          <IconButton>
+            <svg className="w-[14px] h-[14px] opacity-90" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="8" height="8" rx="2"/>
+              <rect x="13" y="3" width="8" height="8" rx="2"/>
+              <rect x="3" y="13" width="8" height="8" rx="2"/>
+              <rect x="13" y="13" width="8" height="8" rx="2"/>
+            </svg>
+          </IconButton>
+          <IconButton onClick={onSpotlightOpen}>
+            <svg className="w-[14px] h-[14px] opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </IconButton>
+          <IconButton className="mr-1">
+            <div
+              className="w-[16px] h-[16px] rounded-full"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B9D 0%, #C865FF 50%, #65C8FF 100%)'
+              }}
+            />
+          </IconButton>
+        </span>
         
-        {/* WiFi */}
-        <IconButton>
-          <svg className="w-[15px] h-[15px] opacity-90" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-4.9-2.3l1.4 1.4C9.4 16.5 10.6 16 12 16s2.6.5 3.5 1.1l1.4-1.4C15.6 14.6 13.9 14 12 14s-3.6.6-4.9 1.7zm-2.8-2.8l1.4 1.4C7.3 13 9.5 12 12 12s4.7 1 6.3 2.3l1.4-1.4C17.7 11.2 15 10 12 10s-5.7 1.2-7.7 2.9zm-2.8-2.8l1.4 1.4C5.3 10.2 8.5 9 12 9s6.7 1.2 9.1 2.5l1.4-1.4C19.8 8.5 16.1 7 12 7s-7.8 1.5-10.5 3.1z"/>
-          </svg>
-        </IconButton>
-        
-        {/* Control Center */}
-        <IconButton>
-          <svg className="w-[14px] h-[14px] opacity-90" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="3" y="3" width="8" height="8" rx="2"/>
-            <rect x="13" y="3" width="8" height="8" rx="2"/>
-            <rect x="3" y="13" width="8" height="8" rx="2"/>
-            <rect x="13" y="13" width="8" height="8" rx="2"/>
-          </svg>
-        </IconButton>
-        
-        {/* Spotlight */}
-        <IconButton onClick={onSpotlightOpen}>
-          <svg className="w-[14px] h-[14px] opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </IconButton>
-        
-        {/* Siri */}
-        <IconButton className="mr-1">
-          <div
-            className="w-[16px] h-[16px] rounded-full"
-            style={{
-              background: 'linear-gradient(135deg, #FF6B9D 0%, #C865FF 50%, #65C8FF 100%)'
-            }}
-          />
-        </IconButton>
-        
-        {/* Time */}
+        {/* Time - always visible */}
         <motion.span 
           className="text-[13px] font-medium ml-1 tabular-nums"
           initial={{ opacity: 0 }}

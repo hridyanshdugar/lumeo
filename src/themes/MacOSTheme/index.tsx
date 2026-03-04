@@ -82,6 +82,15 @@ export const MacOSTheme = ({ manifest }: MacOSThemeProps) => {
   const [spotlightOpen, setSpotlightOpen] = useState(false)
   const [highestZIndex, setHighestZIndex] = useState(1)
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const apps = [
     { id: 'about', title: `About ${manifest.personalInfo.name}`, icon: <AppIcon type="about" />, content: 'about' },
@@ -104,6 +113,27 @@ export const MacOSTheme = ({ manifest }: MacOSThemeProps) => {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setWindows(prev => {
+        if (prev.some(w => w.id === 'about')) return prev
+        return [...prev, {
+          id: 'about',
+          title: `About ${manifest.personalInfo.name}`,
+          icon: <AppIcon type="about" />,
+          content: 'about',
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 150, y: 80 },
+          zIndex: 2,
+        }]
+      })
+      setHighestZIndex(prev => Math.max(prev, 2))
+      setActiveWindowId('about')
+    }, 1000)
+    return () => clearTimeout(timer)
   }, [])
 
   const openWindow = (app: { id: string; title: string; icon: React.ReactNode; content: string }) => {
@@ -204,6 +234,7 @@ export const MacOSTheme = ({ manifest }: MacOSThemeProps) => {
               onMaximize={() => maximizeWindow(window.id)}
               onFocus={() => bringToFront(window.id)}
               onDrag={(pos) => updatePosition(window.id, pos)}
+              isMobile={isMobile}
             />
           )
         ))}
@@ -213,6 +244,7 @@ export const MacOSTheme = ({ manifest }: MacOSThemeProps) => {
         apps={apps}
         openWindows={windows}
         onAppClick={openWindow}
+        isMobile={isMobile}
         onWindowClick={(id) => {
           const window = windows.find(w => w.id === id)
           if (window?.isMinimized) {

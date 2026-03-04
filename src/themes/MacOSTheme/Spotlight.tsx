@@ -81,7 +81,7 @@ export const Spotlight = ({ manifest, apps, onClose, onOpenApp }: SpotlightProps
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: -20 }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        className="fixed top-[20%] left-1/2 -translate-x-1/2 w-[680px] bg-gray-100/98 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden z-50"
+        className="fixed top-[15%] md:top-[20%] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[680px] bg-gray-100/98 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden z-50"
         style={{ boxShadow: '0 25px 80px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.1)' }}
         onClick={e => e.stopPropagation()}
       >
