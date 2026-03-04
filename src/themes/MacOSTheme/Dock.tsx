@@ -136,8 +136,8 @@ export const Dock = ({ apps, openWindows, onAppClick, onWindowClick, isMobile }:
           gap: `${isMobile ? 4 : ICON_SPACING}px`
         }}
         onMouseLeave={() => setHoveredIndex(null)}
-        initial={isMobile ? { y: 100, opacity: 0 } : { x: -100, opacity: 0 }}
-        animate={isMobile ? { y: 0, opacity: 1 } : { x: 0, opacity: 1 }}
+        initial={isMobile ? { y: 100, x: 0, opacity: 0 } : { x: -100, y: 0, opacity: 0 }}
+        animate={isMobile ? { y: 0, x: 0, opacity: 1 } : { x: 0, y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 25, delay: 0.2 }}
       >
         {apps.map((app, index) => {
