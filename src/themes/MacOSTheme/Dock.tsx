@@ -124,7 +124,7 @@ export const Dock = ({ apps, openWindows, onAppClick, onWindowClick, isMobile }:
   return (
     <div
       className={isMobile
-        ? "fixed bottom-2 left-1/2 -translate-x-1/2 z-50"
+        ? "fixed bottom-2 left-0 right-0 flex justify-center z-50"
         : "fixed left-3 top-1/2 -translate-y-1/2 z-50"
       }
       style={isMobile ? {} : { marginTop: '13px' }}

@@ -203,7 +203,7 @@ export const MacOSTheme = ({ manifest }: MacOSThemeProps) => {
 
   return (
     <div 
-      className="h-screen overflow-hidden relative"
+      className="fixed inset-0 overflow-hidden"
       style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
     >
       {/* macOS Sonoma-inspired wallpaper */}
