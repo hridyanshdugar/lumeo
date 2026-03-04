@@ -16,7 +16,7 @@ export default function ThemeSelector({ themes, currentTheme, onThemeChange }: T
         </button>
       </div>
       <div className="p-4 bg-neutral-800">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Object.keys(themes).map((theme) => (
             <button
               key={theme}
