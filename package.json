@@ -21,8 +21,10 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
+    "@types/compression": "^1.8.1",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.5.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",

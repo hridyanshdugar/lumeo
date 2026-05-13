@@ -1,4 +1,5 @@
 import express from 'express'
+import compression from 'compression'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
@@ -24,6 +25,7 @@ app.set('trust proxy', true)
 // Canonical URL redirects (http→https, www→apex) so sitemap URL is the one Google indexes
 app.use(canonicalRedirect)
 
+app.use(compression())
 app.use(cors())
 app.use(express.json())
 

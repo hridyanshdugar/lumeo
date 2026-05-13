@@ -9,6 +9,50 @@ import { getPublicPortfolioDataBySubdomain } from '../controllers/portfolioContr
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+/** Build a map of theme name → list of JS chunk files to modulepreload, using Vite's manifest. */
+function buildThemePreloadMap(frontendDistPath: string): Record<string, string[]> {
+  const map: Record<string, string[]> = {}
+  const themeSources: Record<string, string> = {
+    minimal: 'src/themes/MinimalTheme.tsx',
+    modern: 'src/themes/ModernTheme.tsx',
+    gradient: 'src/themes/GradientTheme.tsx',
+    cyber: 'src/themes/CyberTheme.tsx',
+    terminal: 'src/themes/TerminalTheme.tsx',
+    google: 'src/themes/GoogleTheme/index.tsx',
+    spotify: 'src/themes/SpotifyTheme/index.tsx',
+    notion: 'src/themes/NotionTheme/index.tsx',
+    vscode: 'src/themes/VSCodeTheme/index.tsx',
+    apple: 'src/themes/AppleTheme.tsx',
+    twitter: 'src/themes/TwitterTheme/index.tsx',
+    netflix: 'src/themes/NetflixTheme/index.tsx',
+    windows: 'src/themes/WindowsTheme/index.tsx',
+    macos: 'src/themes/MacOSTheme/index.tsx',
+    newspaper: 'src/themes/NewspaperTheme/index.tsx',
+  }
+
+  try {
+    const manifestPath = path.join(frontendDistPath, '.vite', 'manifest.json')
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
+
+    for (const [theme, src] of Object.entries(themeSources)) {
+      const entry = manifest[src]
+      if (!entry) continue
+      const files: string[] = ['/' + entry.file]
+      if (entry.imports) {
+        for (const imp of entry.imports) {
+          if (imp === 'index.html') continue
+          const dep = manifest[imp]
+          if (dep) files.push('/' + dep.file)
+        }
+      }
+      map[theme] = files
+    }
+  } catch {
+    // Manifest not available — preloading will be skipped silently
+  }
+  return map
+}
+
 const ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'withlumeo.com'
 
 function escapeHtml(s: string): string {
@@ -180,11 +224,15 @@ function buildNoscriptFullProfile(manifest: any): string {
 
 /**
  * In production, for GET requests to / with a profile subdomain, serve index.html
- * with injected meta tags and JSON-LD so crawlers get full user info without JS.
+ * with injected meta tags, JSON-LD, inline portfolio data, and theme modulepreload
+ * hints so the browser can start fetching the theme chunk immediately.
  */
 export function profileSeoMiddleware(
   frontendDistPath: string
 ) {
+  // Build theme→chunk map once at startup
+  const themePreloadMap = buildThemePreloadMap(frontendDistPath)
+
   return function (req: SubdomainRequest, res: Response, next: NextFunction): void {
     if (req.method !== 'GET' || req.path !== '/') {
       return next()
@@ -218,7 +266,20 @@ export function profileSeoMiddleware(
       const metaTags = buildMetaTags(manifest, subdomain)
       const jsonLd = buildFullProfileJsonLd(manifest, subdomain)
       const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`
-      html = html.replace('</head>', `    ${metaTags}\n    ${jsonLdScript}\n  </head>`)
+
+      // Inline the portfolio data so the client can skip the API call entirely
+      const inlineData = JSON.stringify(data)
+      const inlineScript = `<script id="__PORTFOLIO_DATA__" type="application/json">${inlineData}</script>`
+
+      // Add modulepreload hints for the theme's JS chunks so the browser
+      // starts fetching them in parallel with the main bundle
+      const theme = data.theme || 'minimal'
+      const preloadFiles = themePreloadMap[theme] || []
+      const preloadTags = preloadFiles
+        .map(f => `<link rel="modulepreload" href="${f}">`)
+        .join('\n    ')
+
+      html = html.replace('</head>', `    ${metaTags}\n    ${jsonLdScript}\n    ${inlineScript}\n    ${preloadTags}\n  </head>`)
 
       const noscriptSnippet = buildNoscriptFullProfile(manifest)
       html = html.replace('<div id="root"></div>', `${noscriptSnippet}\n    <div id="root"></div>`)

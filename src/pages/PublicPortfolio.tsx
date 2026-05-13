@@ -37,6 +37,30 @@ const themes = {
   newspaper: NewspaperTheme,
 }
 
+/** Try to read portfolio data inlined by the server into the HTML. */
+function getInlinedPortfolioData(): PublicPortfolioResponse | null {
+  try {
+    const el = document.getElementById('__PORTFOLIO_DATA__')
+    if (!el?.textContent) return null
+    return JSON.parse(el.textContent) as PublicPortfolioResponse
+  } catch {
+    return null
+  }
+}
+
+function getSubdomain(): string | null {
+  const hostname = window.location.hostname
+  const parts = hostname.split('.')
+
+  if (parts.length > 2) {
+    if (parts[0] !== 'www') return parts[0]
+  } else if (parts.length === 2 && parts[0] !== 'www' && !parts[0].includes(':')) {
+    const domain = parts.join('.')
+    if (domain !== 'withlumeo.com' && domain !== 'localhost') return parts[0]
+  }
+  return null
+}
+
 export default function PublicPortfolio() {
   const navigate = useNavigate()
   const [portfolio, setPortfolio] = useState<PublicPortfolioResponse | null>(null)
@@ -46,28 +70,10 @@ export default function PublicPortfolio() {
 
   useEffect(() => {
     const loadPortfolio = async () => {
-      // Extract subdomain from hostname
-      const hostname = window.location.hostname
-      const parts = hostname.split('.')
-      
-      // Extract subdomain (e.g., subdomain.withlumeo.com -> subdomain)
-      let subdomain: string | null = null
-      
-      if (parts.length > 2) {
-        // Has subdomain (subdomain.domain.tld)
-        // Skip 'www' - treat it as the main domain
-        if (parts[0] !== 'www') {
-          subdomain = parts[0]
-        }
-      } else if (parts.length === 2 && parts[0] !== 'www' && !parts[0].includes(':')) {
-        // Could be subdomain on localhost or similar
-        const domain = parts.join('.')
-        if (domain !== 'withlumeo.com' && domain !== 'localhost') {
-          subdomain = parts[0]
-        }
-      }
+      const subdomain = getSubdomain()
 
       // If on main domain (withlumeo.com) with no subdomain, redirect to home
+      const hostname = window.location.hostname
       if (!subdomain && (hostname === 'withlumeo.com' || hostname === 'www.withlumeo.com')) {
         navigate('/', { replace: true })
         return
@@ -80,13 +86,13 @@ export default function PublicPortfolio() {
       }
 
       try {
-        const data = await api.getPublicPortfolioBySubdomain(subdomain)
+        // Use inlined data from the server if available, otherwise fall back to API
+        const data = getInlinedPortfolioData() ?? await api.getPublicPortfolioBySubdomain(subdomain)
         setPortfolio(data)
 
         // If random theme is enabled, cycle through themes
         if (data.random_theme) {
           const themeKeys = Object.keys(themes) as ThemeName[]
-          // Use a session counter to cycle through themes
           const viewCount = sessionStorage.getItem(`theme-cycle-${subdomain}`)
           const count = viewCount ? parseInt(viewCount) : 0
           const cycleTheme = themeKeys[count % themeKeys.length]
@@ -96,7 +102,6 @@ export default function PublicPortfolio() {
           setDisplayTheme((data.theme || 'minimal') as ThemeName)
         }
 
-        // Update page title with portfolio name
         document.title = `${data.manifest.personalInfo.name} - Portfolio`
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load portfolio')
